@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KM Smart Dashboard v26.7 - IndexedDB Only</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb; --secondary: #64748b; --success: #10b981;
+            --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; --sidebar-bg: #0f172a;
+            --card-mf: #3b82f6; --card-ss: #f59e0b; --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; scroll-behavior: smooth; }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: var(--bg); 
+            overflow: hidden; 
+        }
+
+        .exit-present { 
+            display: none; 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: var(--danger); 
+            color: white; 
+            z-index: 10001; 
+            padding: 12px 25px; 
+            border-radius: 50px; 
+            border: 2px solid white; 
+            cursor: pointer; 
+            font-family: 'Kanit'; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        #sidebar { 
+            width: 340px; 
+            background: var(--sidebar-bg); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100; 
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header { 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        
+        .kpi-wrapper { 
+            padding: 10px 15px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+        }
+        
+        .kpi-card { 
+            padding: 8px 5px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            border: 2px solid transparent; 
+            transition: 0.3s; 
+            text-align: center; 
+            color: white; 
+        }
+        
+        .kpi-card h5 { 
+            margin: 0; 
+            font-size: 0.7rem; 
+            opacity: 0.9; 
+        }
+        
+        .kpi-card div { 
+            font-size: 1.2rem !important; 
+            font-weight: bold; 
+        }
+        
+        .kpi-card.active { 
+            border-color: white; 
+            box-shadow: 0 0 10px rgba(255,255,255,0.2); 
+            transform: scale(1.02); 
+        }
+
+        .subject-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 10px 15px; 
+        }
+        
+        .subject-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px 15px; 
+            margin-bottom: 8px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            background: rgba(255,255,255,0.03); 
+            transition: 0.2s; 
+        }
+        
+        .subject-item.active { 
+            background: var(--primary); 
+        }
+        
+        .item-tools { 
+            display: flex; 
+            gap: 8px; 
+            opacity: 0; 
+        }
+        
+        .subject-item:hover .item-tools { 
+            opacity: 1; 
+        }
+
+        .data-management { 
+            padding: 15px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(0,0,0,0.3); 
+        }
+        
+        .btn-data { 
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            font-family: 'Kanit'; 
+            margin-bottom: 5px; 
+            font-size: 0.85rem; 
+            transition: transform 0.2s;
+        }
+        
+        .btn-data:hover {
+            transform: translateY(-2px);
+        }
+
+        #quickNav { 
+            display: none; 
+            width: 300px; 
+            background: white; 
+            border-right: 1px solid #eee; 
+            flex-direction: column; 
+            z-index: 10000; 
+        }
+        
+        .nav-header { 
+            padding: 20px; 
+            background: #f8fafc; 
+            border-bottom: 1px solid #eee; 
+        }
+        
+        .nav-tabs { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 5px; 
+            margin-top: 10px; 
+        }
+        
+        .tab-btn { 
+            padding: 8px; 
+            border-radius: 6px; 
+            border: 1px solid #ddd; 
+            cursor: pointer; 
+            font-family: 'Kanit'; 
+            font-size: 0.8rem; 
+            text-align: center; 
+            background: white; 
+        }
+        
+        .tab-btn.active-mf { 
+            background: var(--card-mf); 
+            color: white; 
+            border-color: var(--card-mf); 
+        }
+        
+        .tab-btn.active-ss { 
+            background: var(--card-ss); 
+            color: white; 
+            border-color: var(--card-ss); 
+        }
+        
+        .nav-list-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+        }
+        
+        .nav-item { 
+            padding: 12px 15px; 
+            margin-bottom: 8px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            color: #444; 
+            transition: 0.2s; 
+            font-family: 'Kanit'; 
+            border-left: 4px solid transparent; 
+            background: #fcfcfc; 
+            border: 1px solid #f0f0f0; 
+        }
+        
+        .nav-item.active { 
+            background: #eff6ff; 
+            color: var(--primary); 
+            border-left-color: var(--primary); 
+        }
+
+        #main { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 40px; 
+            position: relative; 
+            display: flex; 
+            align-items: flex-start;
+            justify-content: center; 
+            min-height: 100vh;
+        }
+        
+        .content-card { 
+            background: white; 
+            padding: 45px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            max-width: 1100px; 
+            width: 90%; 
+            min-height: auto; 
+            margin: 0; 
+        }
+        
+        .instructor-card { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            background: #f8fafc; 
+            padding: 20px; 
+            border-radius: 20px; 
+            border: 1px solid #e2e8f0; 
+            margin-bottom: 25px; 
+        }
+        
+        .instructor-img {
+            width: 66%;
+            max-width: 700px;
+            height: auto;
+            display: block;
+            margin: 1.5rem auto 0;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+            background: #eee;
+        }
+        
+        .image-gallery-container {
+            display: flex;
+            gap: 30px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .image-gallery { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 15px; 
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 700px;
+        }
+        
+        .img-item, .video-item { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-radius: 12px; 
+            border: 1px solid #eee; 
+            display: none;
+        }
+        
+        .video-item {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Kanit';
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .video-play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .right-content-container {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .image-captions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .caption-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+        
+        .caption-item.show {
+            display: block;
+        }
+        
+        .caption-item h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-family: 'Kanit';
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .caption-item p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .subject-description {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e0f2fe;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .subject-description h3 {
+            font-family: 'Kanit';
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 8px;
+        }
+        
+        .subject-description p {
+            margin: 0;
+            color: #334155;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        #viewText {
+            display: none !important;
+        }
+
+        body.present-mode .exit-present { display: block; }
+        body.present-mode #sidebar, body.present-mode #actionBar { display: none !important; }
+        body.present-mode #quickNav { display: flex; }
+        body.present-mode #main { 
+            padding: 0; 
+            background: #fff; 
+            display: block;
+            overflow-y: auto;
+            align-items: normal;
+        }
+        
+        body.present-mode.mf-bg {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%) !important;
+        }
+        
+        body.present-mode.ss-bg {
+            background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%) !important;
+        }
+        
+        body.present-mode.mf-bg .content-card {
+            border-top: 10px solid var(--card-mf);
+            border-bottom: 10px solid var(--card-mf);
+        }
+        
+        body.present-mode.ss-bg .content-card {
+            border-top: 10px solid var(--card-ss);
+            border-bottom: 10px solid var(--card-ss);
+        }
+        
+        body.present-mode.mf-bg #viewTitle {
+            color: var(--card-mf);
+            border-bottom: 3px solid var(--card-mf);
+            padding-bottom: 10px;
+        }
+        
+        body.present-mode.ss-bg #viewTitle {
+            color: var(--card-ss);
+            border-bottom: 3px solid var(--card-ss);
+            padding-bottom: 10px;
+        }
+        
+        body.present-mode.mf-bg .instructor-card {
+            border-left: 6px solid var(--card-mf);
+        }
+        
+        body.present-mode.ss-bg .instructor-card {
+            border-left: 6px solid var(--card-ss);
+        }
+        
+        body.present-mode.mf-bg #viewCourseType {
+            color: var(--card-mf) !important;
+        }
+        
+        body.present-mode.ss-bg #viewCourseType {
+            color: var(--card-ss) !important;
+        }
+        
+        body.present-mode .image-gallery-container {
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 40px;
+            min-height: auto;
+        }
+        
+        body.present-mode .right-content-container {
+            min-width: 350px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 0;
+            max-height: none;
+            overflow-y: visible;
+        }
+        
+        body.present-mode .subject-description {
+            background: white;
+            border: 2px solid #e2e8f0;
+            max-height: none;
+            overflow-y: visible;
+        }
+        
+        body.present-mode.mf-bg .subject-description {
+            border-color: var(--card-mf);
+        }
+        
+        body.present-mode.ss-bg .subject-description {
+            border-color: var(--card-ss);
+        }
+        
+        body.present-mode .image-gallery {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        body.present-mode .img-item, 
+        body.present-mode .video-item {
+            height: 220px;
+        }
+        
+        body.present-mode .content-card { 
+            margin: 0 auto;
+            box-shadow: none; 
+            border-radius: 0; 
+            max-width: 100%; 
+            padding: 40px 10%; 
+            min-height: auto;
+            display: block;
+            width: 100%;
+        }
+
+        .btn { 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            border: none; 
+            cursor: pointer; 
+            font-family: 'Kanit'; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-weight: 500; 
+        }
+        
+        .editor-box { 
+            background: #f8fafc; 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 1px solid #e2e8f0; 
+            margin-bottom: 20px; 
+        }
+        
+        #textEditor { 
+            width: 100%; 
+            height: 250px; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            font-family: 'Sarabun'; 
+            font-size: 1rem;
+            resize: vertical;
+            background: white;
+            color: black;
+        }
+        
+        .upload-container {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-container {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #10b981;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+        
+        .progress-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .upload-status {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 5px;
+            color: var(--success);
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .caption-input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'Sarabun';
+        }
+        
+        .course-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Kanit';
+            font-weight: 600;
+            font-size: 1.1rem;
+            z-index: 10002;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* ซื้อ course-badge ในโหมดนำเสนอ */
+        body.present-mode .course-badge {
+            display: none !important;
+        }
+        
+        .course-badge.mf {
+            background: var(--card-mf);
+            color: white;
+        }
+        
+        .course-badge.ss {
+            background: var(--card-ss);
+            color: white;
+        }
+        
+        .video-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .video-card.show {
+            display: block;
+        }
+        
+        .video-card h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-family: 'Kanit';
+            font-size: 1.2rem;
+        }
+        
+        .video-player {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .video-caption {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .db-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            z-index: 9999;
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .db-status.success {
+            background: #10b981;
+        }
+        
+        .db-status.warning {
+            background: #f59e0b;
+        }
+        
+        .db-status.error {
+            background: #ef4444;
+        }
+        
+        @media (max-width: 1200px) {
+            .image-gallery-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .right-content-container {
+                width: 100%;
+                max-width: 700px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #main {
+                padding: 20px;
+            }
+            
+            .content-card {
+                padding: 25px;
+                width: 95%;
+            }
+            
+            .image-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            body.present-mode .content-card {
+                padding: 30px 5%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+    </style>
+</head>
+<body id="appBody">
+
+<div class="db-status" id="dbStatus">IndexedDB: Connected</div>
+
+<button class="exit-present" onclick="exitFullPresentation()">❌ จบการนำเสนอ (ESC)</button>
+
+<div id="courseBadge" class="course-badge" style="display: none;"></div>
+
+<div id="quickNav">
+    <div class="nav-header">
+        <h4 style="font-family:'Kanit'; color:var(--primary); margin:0;">เลือกวิชา</h4>
+        <div class="nav-tabs">
+            <div id="tabMF" class="tab-btn" onclick="setCategory('MF')">จันทร์-ศุกร์</div>
+            <div id="tabSS" class="tab-btn" onclick="setCategory('SS')">เสาร์-อาทิตย์</div>
+        </div>
+    </div>
+    <div id="quickNavList" class="nav-list-container"></div>
+</div>
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <h2 style="font-family:'Kanit'; color:#38bdf8; margin:0;">KM SMART HUB</h2>
+        <div id="storageInfo" style="font-size:0.7rem; color:#94a3b8; margin-top:5px;">กำลังโหลดข้อมูล...</div>
+    </div>
+    <button class="btn" style="background:var(--success); color:white; margin:15px; justify-content:center;" onclick="addNewSubject()">+ เพิ่มวิชาใหม่</button>
+    
+    <div class="kpi-wrapper">
+        <div class="kpi-card active" id="kpiMF" style="background:var(--card-mf);" onclick="setCategory('MF')">
+            <h5>จันทร์ - ศุกร์</h5>
+            <div id="countMF">0</div>
+        </div>
+        <div class="kpi-card" id="kpiSS" style="background:var(--card-ss);" onclick="setCategory('SS')">
+            <h5>เสาร์ - อาทิตย์</h5>
+            <div id="countSS">0</div>
+        </div>
+    </div>
+    
+    <div id="subjectList" class="subject-container"></div>
+
+    <div class="data-management">
+        <button class="btn-data" style="background:var(--primary); color:white;" onclick="exportData()">📤 Export ข้อมูล</button>
+        <button class="btn-data" style="background:var(--purple); color:white;" onclick="exportByCategory()">📂 Export แยกหมวดหมู่</button>
+        <button class="btn-data" style="background:var(--secondary); color:white;" onclick="importTrigger()">📥 Import ข้อมูล</button>
+        <button class="btn-data" style="background:#8b5cf6; color:white;" onclick="batchImport()">📦 Import หลายไฟล์</button>
+        <button class="btn-data" style="background:#10b981; color:white; font-size:0.75rem;" onclick="showDBInfo()">ℹ️ ข้อมูล IndexedDB</button>
+        <button class="btn-data" style="background:#f59e0b; color:white; font-size:0.75rem;" onclick="checkStorageQuota()">📊 ตรวจสอบพื้นที่</button>
+        <button class="btn-data" style="background:#ef4444; color:white; font-size:0.75rem;" onclick="cleanupLargeFiles()">🧹 ลบไฟล์ใหญ่</button>
+        <input type="file" id="fileInput" style="display:none" onchange="processImport(this)">
+        <input type="file" id="batchFileInput" style="display:none" multiple accept=".json">
+        
+        <!-- Import Progress Bar -->
+        <div id="importProgress" style="display:none; margin-top:10px; background:#f1f5f9; padding:10px; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:0.8rem;">กำลัง Import...</span>
+                <span id="importPercent" style="font-size:0.8rem; font-weight:bold;">0%</span>
+            </div>
+            <div style="width:100%; height:6px; background:#cbd5e1; border-radius:3px; overflow:hidden;">
+                <div id="importProgressBar" style="width:0%; height:100%; background:#10b981; transition:width 0.3s;"></div>
+            </div>
+            <div id="importStatus" style="font-size:0.7rem; color:#64748b; margin-top:5px;">
+                กำลังเตรียมข้อมูล...
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="main">
+    <div id="welcome" style="text-align:center; color:#94a3b8;">
+        <h1 style="font-family:'Kanit'">กรุณาเลือกวิชาจากรายการ</h1>
+        <p id="dataStatus">กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <div class="content-card" id="contentCard" style="display:none;">
+        <div class="action-bar" id="actionBar" style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:25px;">
+            <button class="btn" style="background: #1e293b; color: white;" onclick="enterFullPresentation()">🖥️ เริ่มนำเสนอ</button>
+            <button class="btn" style="background: #e2e8f0;" onclick="enableEditMode()">📝 แก้ไขเนื้อหา</button>
+        </div>
+
+        <div class="instructor-card">
+            <img src="" id="viewInstImg" class="instructor-img">
+            <div class="instructor-info">
+                <p id="viewCourseType" style="margin:0; font-size:0.75rem; font-weight:bold; color:var(--primary);"></p>
+                <h4 id="viewInstName" style="margin:5px 0; font-family:'Kanit';"></h4>
+                <span id="viewInstTitle" style="color:#64748b; font-size:0.9rem;"></span>
+                <p id="viewCourseType" style="margin:0; font-size:0.75rem; font-weight:bold; color:var(--primary);"></p>
+            </div>
+        </div>
+
+        <div id="presentationArea">
+            <h1 id="viewTitle" style="font-family:'Kanit'; color:var(--primary); font-size:2.8rem; margin:0; margin-bottom: 10px;"></h1>
+            
+            <div class="image-gallery-container">
+                <div class="image-gallery" id="imgGallery">
+                    <img id="viewImage1" class="img-item">
+                    <img id="viewImage2" class="img-item">
+                    <img id="viewImage3" class="img-item">
+                    <img id="viewImage4" class="img-item">
+                    <img id="viewImage5" class="img-item">
+                    <div id="viewVideo" class="video-item">
+                        <div class="video-play-icon">▶️</div>
+                    </div>
+                </div>
+                
+                <div class="right-content-container" id="rightContent">
+                    <div class="image-captions" id="imageCaptions"></div>
+                    
+                    <div class="video-card" id="videoCard">
+                        <h4>วีดีโอประกอบ</h4>
+                        <div id="videoPlayerContainer"></div>
+                        <div class="video-caption" id="videoCaption"></div>
+                    </div>
+                    
+                    <div class="subject-description" id="subjectDescription"></div>
+                </div>
+            </div>
+            
+            <p id="viewText" style="display:none;"></p>
+        </div>
+
+        <div id="editorArea" style="display:none;">
+            <h2 style="font-family:'Kanit'">🛠️ ตั้งค่าวิชา</h2>
+            <div class="editor-box">
+                <label><b>ชื่อวิชา:</b></label><input type="text" id="editSubjectName" style="width:100%; padding:8px; margin-top:5px;">
+                <label style="display:block; margin-top:10px;"><b>หลักสูตร:</b></label>
+                <select id="typeInput" style="width:100%; padding:8px;"><option value="MF">จันทร์ - ศุกร์</option><option value="SS">เสาร์ - อาทิตย์</option></select>
+            </div>
+            <div class="editor-box">
+                <label><b>วิทยากร:</b></label>
+                <input type="text" id="instNameInput" placeholder="ชื่อ-นามสกุล" style="width:100%; padding:8px; margin-bottom:10px;">
+                <input type="text" id="instTitleInput" placeholder="ตำแหน่ง" style="width:100%; padding:8px; margin-bottom:10px;">
+                
+                <div class="upload-container">
+                    <small>รูปวิทยากร:</small> 
+                    <input type="file" id="fInst" accept="image/*" onchange="uploadWithProgress(this, 'pInst')">
+                    <div id="pInst" class="progress-container">
+                        <div class="progress-bar"><div class="progress-fill" id="pInstFill"></div></div>
+                        <div class="progress-text" id="pInstText">0%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="editor-box">
+                <label><b>เนื้อหาประกอบ (5 รูป + วิดีโอ):</b></label><br>
+                <div style="margin:10px 0;">
+                    <div class="upload-container">
+                        <small>รูปที่ 1:</small> 
+                        <input type="file" id="fContent1" accept="image/*" onchange="uploadWithProgress(this, 'pC1')">
+                        <div id="pC1" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pC1Fill"></div></div>
+                            <div class="progress-text" id="pC1Text">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInput1" placeholder="คำบรรยายรูปที่ 1">
+                    
+                    <div class="upload-container">
+                        <small>รูปที่ 2:</small> 
+                        <input type="file" id="fContent2" accept="image/*" onchange="uploadWithProgress(this, 'pC2')">
+                        <div id="pC2" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pC2Fill"></div></div>
+                            <div class="progress-text" id="pC2Text">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInput2" placeholder="คำบรรยายรูปที่ 2">
+                    
+                    <div class="upload-container">
+                        <small>รูปที่ 3:</small> 
+                        <input type="file" id="fContent3" accept="image/*" onchange="uploadWithProgress(this, 'pC3')">
+                        <div id="pC3" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pC3Fill"></div></div>
+                            <div class="progress-text" id="pC3Text">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInput3" placeholder="คำบรรยายรูปที่ 3">
+                    
+                    <div class="upload-container">
+                        <small>รูปที่ 4:</small> 
+                        <input type="file" id="fContent4" accept="image/*" onchange="uploadWithProgress(this, 'pC4')">
+                        <div id="pC4" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pC4Fill"></div></div>
+                            <div class="progress-text" id="pC4Text">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInput4" placeholder="คำบรรยายรูปที่ 4">
+                    
+                    <div class="upload-container">
+                        <small>รูปที่ 5:</small> 
+                        <input type="file" id="fContent5" accept="image/*" onchange="uploadWithProgress(this, 'pC5')">
+                        <div id="pC5" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pC5Fill"></div></div>
+                            <div class="progress-text" id="pC5Text">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInput5" placeholder="คำบรรยายรูปที่ 5">
+                    
+                    <div class="upload-container">
+                        <small>วีดีโอประกอบ (MP4, WebM):</small> 
+                        <input type="file" id="fVideo" accept="video/*" onchange="uploadWithProgress(this, 'pVideo')">
+                        <div id="pVideo" class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" id="pVideoFill"></div></div>
+                            <div class="progress-text" id="pVideoText">0%</div>
+                        </div>
+                    </div>
+                    <input type="text" class="caption-input" id="captionInputVideo" placeholder="คำบรรยายวีดีโอ">
+                </div>
+                <textarea id="textEditor" placeholder="พิมพ์เนื้อหาวิชาที่นี่..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="background:var(--success); color:white; flex:1;" id="saveBtn" onclick="saveData()">💾 บันทึกลง IndexedDB</button>
+                <button class="btn" onclick="cancelEdit()" style="background:#cbd5e1;">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===============================
+    // DATABASE CONFIGURATION - INDEXEDDB ONLY
+    // ===============================
+    const DB_NAME = 'KM_SmartHub_DB';
+    const STORE_NAME = 'subjects';
+    const DB_VERSION = 3;
+    
+    let db;
+    let currentCategory = 'MF';
+    let currentActiveId = "";
+    let currentCourseType = 'MF';
+    let isInitialized = false;
+
+    // ===============================
+    // INDEXEDDB OPERATIONS
+    // ===============================
+    const dbOp = {
+        save: (data) => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).put(data);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        }),
+        
+        get: (id) => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(id);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = (e) => reject(e.target.error);
+        }),
+        
+        getAll: () => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = (e) => reject(e.target.error);
+        }),
+        
+        delete: (id) => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).delete(id);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        }),
+        
+        count: () => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).count();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = (e) => reject(e.target.error);
+        }),
+        
+        clearAll: () => new Promise((resolve, reject) => {
+            if (!db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).clear();
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        })
+    };
+
+    // ===============================
+    // DATABASE INITIALIZATION
+    // ===============================
+    async function initDB() {
+        return new Promise((resolve, reject) => {
+            try {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onupgradeneeded = (e) => {
+                    console.log("Database upgrade needed to version", e.newVersion);
+                    const db = e.target.result;
+                    
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('type', 'type', { unique: false });
+                        store.createIndex('name', 'name', { unique: false });
+                        store.createIndex('createdAt', 'createdAt', { unique: false });
+                        console.log("Object store created");
+                    }
+                };
+                
+                request.onsuccess = (e) => { 
+                    db = e.target.result;
+                    
+                    db.onversionchange = () => {
+                        db.close();
+                        console.log("Database is being upgraded in another tab");
+                    };
+                    
+                    db.onerror = (e) => {
+                        console.error("Database error:", e.target.error);
+                    };
+                    
+                    console.log("IndexedDB initialized successfully");
+                    resolve(db);
+                };
+                
+                request.onerror = (e) => {
+                    console.error("IndexedDB open failed:", e.target.error);
+                    reject(e.target.error);
+                };
+                
+                request.onblocked = () => {
+                    console.warn("Database is blocked. Please close other tabs.");
+                    reject(new Error("Database blocked"));
+                };
+            } catch (e) {
+                console.error("InitDB failed:", e);
+                reject(e);
+            }
+        });
+    }
+
+    // ===============================
+    // IMPROVED EXPORT FUNCTION WITH STORAGE HANDLING
+    // ===============================
+    async function exportData() {
+        try {
+            const statusEl = document.getElementById('dbStatus');
+            if (statusEl) {
+                statusEl.textContent = "⏳ กำลังเตรียมข้อมูลสำหรับ Export...";
+                statusEl.className = "db-status warning";
+                statusEl.style.display = 'block';
+            }
+            
+            console.log("เริ่มกระบวนการ Export...");
+            const all = await dbOp.getAll();
+            console.log("ได้ข้อมูลทั้งหมด:", all.length, "รายการ");
+            
+            if (all.length === 0) {
+                alert("⚠️ ไม่มีข้อมูลใน IndexedDB สำหรับ Export");
+                if (statusEl) {
+                    statusEl.textContent = `IndexedDB: 0 items`;
+                    statusEl.className = "db-status";
+                }
+                return;
+            }
+            
+            let totalSize = 0;
+            let hasLargeFiles = false;
+            let largeSubjects = [];
+            
+            all.forEach((item, index) => {
+                try {
+                    const jsonSize = JSON.stringify(item).length;
+                    totalSize += jsonSize;
+                    
+                    if (jsonSize > 5 * 1024 * 1024) {
+                        hasLargeFiles = true;
+                        largeSubjects.push({
+                            name: item.name || `วิชาที่ ${index + 1}`,
+                            size: (jsonSize / (1024 * 1024)).toFixed(2) + ' MB'
+                        });
+                    }
+                    
+                    console.log(`วิชา ${index + 1}: ${item.name || 'ไม่มีชื่อ'}, ขนาด: ${(jsonSize/1024).toFixed(2)} KB`);
+                } catch (e) {
+                    console.warn(`ไม่สามารถคำนวณขนาดสำหรับวิชาที่ ${index + 1}:`, e);
+                }
+            });
+            
+            const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+            console.log(`ขนาดข้อมูลรวม: ${sizeMB} MB`);
+            
+            if (hasLargeFiles) {
+                let message = `พบวิชาที่มีไฟล์ขนาดใหญ่:\n`;
+                largeSubjects.forEach(sub => {
+                    message += `• ${sub.name} (${sub.size})\n`;
+                });
+                message += `\nขนาดข้อมูลทั้งหมด: ${sizeMB} MB\n\n`;
+                message += `คำแนะนำ: \n1. ลบไฟล์วีดีโอหรือภาพที่ไม่จำเป็น\n2. ลดคุณภาพของไฟล์ภาพก่อนอัปโหลด\n3. Export แยกเป็นครั้งละน้อยๆ\n\nต้องการ Export ต่อไหม?`;
+                
+                if (!confirm(message)) {
+                    if (statusEl) {
+                        statusEl.textContent = `IndexedDB: ${all.length} items`;
+                        statusEl.className = "db-status";
+                    }
+                    return;
+                }
+            }
+            
+            if (totalSize > 100 * 1024 * 1024) {
+                alert("❌ ข้อมูลมีขนาดใหญ่เกินไปสำหรับการ Export\n\nโปรด:\n1. ลบวิชาที่ไม่จำเป็น\n2. ลบไฟล์วีดีโอ/ภาพขนาดใหญ่\n3. ลอง Export แยกเป็นหลายครั้ง");
+                if (statusEl) {
+                    statusEl.textContent = `IndexedDB: ${all.length} items`;
+                    statusEl.className = "db-status";
+                }
+                return;
+            }
+            
+            if (statusEl) {
+                statusEl.textContent = "⏳ กำลังสร้างไฟล์ Export...";
+            }
+            
+            const exportData = {
+                version: '3.0',
+                exportDate: new Date().toISOString(),
+                storageType: 'IndexedDB',
+                count: all.length,
+                totalSizeMB: sizeMB,
+                hasLargeFiles: hasLargeFiles,
+                data: all
+            };
+            
+            console.log("กำลังสร้าง JSON string...");
+            
+            let jsonString;
+            try {
+                jsonString = JSON.stringify(exportData, (key, value) => {
+                    if (value === undefined) {
+                        return null;
+                    }
+                    if (typeof value === 'string' && value.length > 1000000) {
+                        console.warn(`พบ string ขนาดใหญ่ในฟิลด์ ${key}: ${(value.length/1024/1024).toFixed(2)}MB`);
+                        return value.substring(0, 100000) + `...[ตัดเนื่องจากขนาดใหญ่ ${(value.length/1024/1024).toFixed(2)}MB]`;
+                    }
+                    return value;
+                }, 2);
+            } catch (e) {
+                console.error("JSON.stringify failed:", e);
+                alert("❌ ไม่สามารถแปลงข้อมูลเป็น JSON ได้\n\nสาเหตุอาจมาจาก:\n1. ข้อมูลบางส่วนเสียหาย\n2. มีไฟล์ขนาดใหญ่เกินไป\n3. มีอักขระพิเศษในข้อมูล");
+                
+                if (statusEl) {
+                    statusEl.textContent = `IndexedDB: ${all.length} items`;
+                    statusEl.className = "db-status";
+                }
+                return;
+            }
+            
+            console.log("ขนาด JSON String:", (jsonString.length/1024/1024).toFixed(2), "MB");
+            
+            if (statusEl) {
+                statusEl.textContent = "⏳ กำลังดาวน์โหลดไฟล์...";
+            }
+            
+            let blob;
+            try {
+                blob = new Blob([jsonString], {type: 'application/json'});
+            } catch (e) {
+                console.error("Blob creation failed:", e);
+                
+                if (jsonString.length > 50 * 1024 * 1024) {
+                    alert("⚠️ ข้อมูลใหญ่เกินไปสำหรับการ Export ครั้งเดียว\n\nโปรดใช้วิธี:\n1. Export แยกตามหมวดหมู่\n2. ลบไฟล์สื่อขนาดใหญ่\n3. ติดต่อผู้ดูแลระบบ");
+                    
+                    if (statusEl) {
+                        statusEl.textContent = `IndexedDB: ${all.length} items`;
+                        statusEl.className = "db-status";
+                    }
+                    return;
+                } else {
+                    alert("❌ เกิดข้อผิดพลาดในการสร้างไฟล์ Export");
+                    throw e;
+                }
+            }
+            
+            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+            const filename = `KM_Backup_${timestamp}_${all.length}items.json`;
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.style.display = 'none';
+            
+            a.onclick = () => {
+                setTimeout(() => {
+                    URL.revokeObjectURL(a.href);
+                    if (statusEl) {
+                        statusEl.textContent = `✅ Export สำเร็จ: ${all.length} items`;
+                        statusEl.className = "db-status success";
+                        
+                        setTimeout(() => {
+                            statusEl.textContent = `IndexedDB: ${all.length} items`;
+                            statusEl.className = "db-status";
+                        }, 3000);
+                    }
+                }, 1000);
+            };
+            
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 100);
+            
+            console.log("✅ Export สำเร็จ:", filename);
+            
+            setTimeout(() => {
+                alert(`✅ Export สำเร็จ!\n\n• จำนวนวิชา: ${all.length} รายการ\n• ขนาดไฟล์: ${sizeMB} MB\n• ชื่อไฟล์: ${filename}\n• วันที่: ${new Date().toLocaleDateString('th-TH')}\n\nไฟล์ถูกดาวน์โหลดไปยังโฟลเดอร์ Downloads แล้ว`);
+            }, 500);
+            
+        } catch (e) {
+            console.error("Export failed completely:", e);
+            
+            const statusEl = document.getElementById('dbStatus');
+            if (statusEl) {
+                statusEl.textContent = `❌ Export ล้มเหลว`;
+                statusEl.className = "db-status error";
+                
+                setTimeout(() => {
+                    dbOp.count().then(count => {
+                        statusEl.textContent = `IndexedDB: ${count} items`;
+                        statusEl.className = "db-status";
+                    });
+                }, 3000);
+            }
+            
+            let errorMessage = "❌ Export ล้มเหลว\n\n";
+            
+            if (e.name === 'QuotaExceededError' || e.message.includes('quota')) {
+                errorMessage += "สาเหตุ: พื้นที่จัดเก็บเต็ม\n\n";
+                errorMessage += "วิธีแก้ไข:\n";
+                errorMessage += "1. ลบวิชาที่ไม่จำเป็น\n";
+                errorMessage += "2. ลบไฟล์วีดีโอ/ภาพขนาดใหญ่\n";
+                errorMessage += "3. ล้างแคชเบราว์เซอร์\n";
+                errorMessage += "4. ลองใช้เบราว์เซอร์อื่น\n";
+            } else if (e.message.includes('size') || e.message.includes('large')) {
+                errorMessage += "สาเหตุ: ข้อมูลมีขนาดใหญ่เกินไป\n\n";
+                errorMessage += "วิธีแก้ไข:\n";
+                errorMessage += "1. Export แยกตามหมวดหมู่\n";
+                errorMessage += "2. ลบไฟล์สื่อที่ไม่จำเป็น\n";
+                errorMessage += "3. ติดต่อผู้ดูแลระบบ\n";
+            } else {
+                errorMessage += `ข้อผิดพลาด: ${e.message || e.toString()}`;
+            }
+            
+            alert(errorMessage);
+        }
+    }
+
+    // ===============================
+    // FUNCTION TO EXPORT BY CATEGORY
+    // ===============================
+    async function exportByCategory() {
+        try {
+            const all = await dbOp.getAll();
+            
+            const mfData = all.filter(item => item.type === 'MF');
+            const ssData = all.filter(item => item.type === 'SS');
+            
+            let choice = prompt(
+                `เลือกหมวดหมู่ที่ต้องการ Export:\n\n` +
+                `1. จันทร์-ศุกร์ (${mfData.length} รายการ)\n` +
+                `2. เสาร์-อาทิตย์ (${ssData.length} รายการ)\n` +
+                `3. ทั้งหมด\n\n` +
+                `ป้อนตัวเลข (1, 2, 3):`
+            );
+            
+            let dataToExport = [];
+            let categoryName = "";
+            
+            switch(choice) {
+                case '1':
+                    dataToExport = mfData;
+                    categoryName = "MF";
+                    break;
+                case '2':
+                    dataToExport = ssData;
+                    categoryName = "SS";
+                    break;
+                case '3':
+                    return exportData();
+                default:
+                    return;
+            }
+            
+            if (dataToExport.length === 0) {
+                alert(`⚠️ ไม่มีข้อมูลในหมวดหมู่ ${categoryName === 'MF' ? 'จันทร์-ศุกร์' : 'เสาร์-อาทิตย์'}`);
+                return;
+            }
+            
+            const exportDataObj = {
+                version: '3.0',
+                exportDate: new Date().toISOString(),
+                category: categoryName,
+                categoryName: categoryName === 'MF' ? 'จันทร์-ศุกร์' : 'เสาร์-อาทิตย์',
+                count: dataToExport.length,
+                data: dataToExport
+            };
+            
+            const jsonString = JSON.stringify(exportDataObj, null, 2);
+            const blob = new Blob([jsonString], {type: 'application/json'});
+            
+            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+            const filename = `KM_${categoryName}_Backup_${timestamp}_${dataToExport.length}items.json`;
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            }, 100);
+            
+            alert(`✅ Export สำเร็จ!\n\nหมวดหมู่: ${categoryName === 'MF' ? 'จันทร์-ศุกร์' : 'เสาร์-อาทิตย์'}\nจำนวน: ${dataToExport.length} รายการ`);
+            
+        } catch (e) {
+            console.error("Export by category failed:", e);
+            alert("❌ Export ล้มเหลว");
+        }
+    }
+
+    // ===============================
+    // FUNCTION TO CHECK STORAGE QUOTA
+    // ===============================
+    async function checkStorageQuota() {
+        if ('storage' in navigator && 'estimate' in navigator.storage) {
+            try {
+                const estimate = await navigator.storage.estimate();
+                const usageMB = (estimate.usage / (1024 * 1024)).toFixed(2);
+                const quotaMB = (estimate.quota / (1024 * 1024)).toFixed(2);
+                const percentage = ((estimate.usage / estimate.quota) * 100).toFixed(1);
+                
+                let message = `📊 สถานะพื้นที่จัดเก็บ:\n\n`;
+                message += `• ใช้ไปแล้ว: ${usageMB} MB\n`;
+                message += `• พื้นที่ทั้งหมด: ${quotaMB} MB\n`;
+                message += `• ใช้ไปแล้ว: ${percentage}%\n\n`;
+                
+                if (percentage > 80) {
+                    message += `⚠️ พื้นที่จัดเก็บใกล้เต็ม!\nโปรดลบข้อมูลที่ไม่จำเป็น`;
+                } else if (percentage > 50) {
+                    message += `ℹ️ พื้นที่จัดเก็บใช้ไปมากกว่าครึ่ง\nควรสำรองข้อมูลเป็นระยะ`;
+                } else {
+                    message += `✅ พื้นที่จัดเก็บเพียงพอ`;
+                }
+                
+                alert(message);
+                
+            } catch (e) {
+                console.error("Storage estimate failed:", e);
+                alert("ไม่สามารถตรวจสอบพื้นที่จัดเก็บได้");
+            }
+        } else {
+            alert("เบราว์เซอร์นี้ไม่รองรับการตรวจสอบพื้นที่จัดเก็บ");
+        }
+    }
+
+    // ===============================
+    // FUNCTION TO CLEAN UP LARGE FILES
+    // ===============================
+    async function cleanupLargeFiles() {
+        try {
+            const all = await dbOp.getAll();
+            
+            let largeFiles = [];
+            all.forEach((item, index) => {
+                const itemSize = JSON.stringify(item).length;
+                if (itemSize > 2 * 1024 * 1024) {
+                    largeFiles.push({
+                        id: item.id,
+                        name: item.name || `วิชาที่ ${index + 1}`,
+                        size: (itemSize / (1024 * 1024)).toFixed(2) + ' MB',
+                        hasVideo: !!item.video,
+                        hasImages: !!item.contentImg || !!item.contentImg2 || !!item.contentImg3 || !!item.contentImg4 || !!item.contentImg5
+                    });
+                }
+            });
+            
+            if (largeFiles.length === 0) {
+                alert("✅ ไม่พบไฟล์ขนาดใหญ่ในระบบ");
+                return;
+            }
+            
+            let message = `พบไฟล์ขนาดใหญ่ ${largeFiles.length} รายการ:\n\n`;
+            largeFiles.forEach(file => {
+                message += `• ${file.name} (${file.size})`;
+                if (file.hasVideo) message += " 📹";
+                if (file.hasImages) message += " 🖼️";
+                message += "\n";
+            });
+            
+            message += "\nต้องการลบไฟล์วีดีโอและภาพออกจากวิชาเหล่านี้ไหม?\n(จะยังเก็บชื่อวิชาและข้อมูลอื่นๆ ไว้)";
+            
+            if (confirm(message)) {
+                let cleanedCount = 0;
+                
+                for (const file of largeFiles) {
+                    const item = await dbOp.get(file.id);
+                    if (item) {
+                        const fieldsToRemove = [
+                            'video', 'videoType', 'contentImg', 'contentImg1', 'contentImg2', 
+                            'contentImg3', 'contentImg4', 'contentImg5', 'instImg'
+                        ];
+                        
+                        let wasModified = false;
+                        fieldsToRemove.forEach(field => {
+                            if (item[field]) {
+                                delete item[field];
+                                wasModified = true;
+                            }
+                        });
+                        
+                        if (wasModified) {
+                            item.updatedAt = new Date().toISOString();
+                            await dbOp.save(item);
+                            cleanedCount++;
+                        }
+                    }
+                }
+                
+                alert(`✅ ทำความสะอาดไฟล์ขนาดใหญ่สำเร็จ\n\nลบไฟล์ออกจาก ${cleanedCount} วิชา\n\nระบบจะรีเฟรชหน้าจออัตโนมัติ`);
+                location.reload();
+            }
+            
+        } catch (e) {
+            console.error("Cleanup failed:", e);
+            alert("❌ การทำความสะอาดล้มเหลว");
+        }
+    }
+
+    // ===============================
+    // ENHANCED IMPORT FUNCTION WITH MERGE SUPPORT
+    // ===============================
+    async function processImport(input) {
+        if (!input.files[0]) return;
+        
+        // แสดง progress bar
+        const progressEl = document.getElementById('importProgress');
+        const progressBar = document.getElementById('importProgressBar');
+        const progressPercent = document.getElementById('importPercent');
+        const statusEl = document.getElementById('importStatus');
+        
+        progressEl.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressPercent.textContent = '0%';
+        statusEl.textContent = 'กำลังอ่านไฟล์...';
+        
+        const reader = new FileReader();
+        reader.onload = async function() {
+            try {
+                const importData = JSON.parse(reader.result);
+                
+                if (!importData.data || !Array.isArray(importData.data)) {
+                    alert("⚠️ ไฟล์ไม่ถูกต้อง: ไม่พบข้อมูล");
+                    progressEl.style.display = 'none';
+                    return;
+                }
+                
+                // ดึงข้อมูลเดิมจาก IndexedDB
+                statusEl.textContent = 'กำลังตรวจสอบข้อมูลในระบบ...';
+                const existingData = await dbOp.getAll();
+                
+                // สร้าง dialog เลือกโหมด
+                const importMode = await showImportDialog(importData.data.length, existingData.length);
+                if (!importMode) {
+                    progressEl.style.display = 'none';
+                    return;
+                }
+                
+                let importedItems = [];
+                let skippedItems = [];
+                let mergedItems = [];
+                
+                if (importMode === 'replace') {
+                    // โหมดแทนที่: ล้างข้อมูลเก่าแล้วเพิ่มใหม่ทั้งหมด
+                    statusEl.textContent = 'กำลังล้างข้อมูลเดิม...';
+                    await dbOp.clearAll();
+                    
+                    for (let i = 0; i < importData.data.length; i++) {
+                        const item = importData.data[i];
+                        const percent = Math.round((i / importData.data.length) * 100);
+                        progressBar.style.width = percent + '%';
+                        progressPercent.textContent = percent + '%';
+                        statusEl.textContent = `กำลังนำเข้ารายการที่ ${i+1} จาก ${importData.data.length}`;
+                        
+                        try {
+                            if (item.id && item.name) {
+                                item.updatedAt = new Date().toISOString();
+                                await dbOp.save(item);
+                                importedItems.push(item.name);
+                            }
+                        } catch (e) {
+                            console.warn("Failed to import item:", item, e);
+                        }
+                        
+                        // ให้เบราว์เซอร์ได้หายใจ
+                        if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                    
+                } else if (importMode === 'merge') {
+                    // โหมดผสาน: ตรวจสอบ ID ซ้ำก่อนบันทึก
+                    const existingIds = new Set(existingData.map(item => item.id));
+                    
+                    for (let i = 0; i < importData.data.length; i++) {
+                        const item = importData.data[i];
+                        const percent = Math.round((i / importData.data.length) * 100);
+                        progressBar.style.width = percent + '%';
+                        progressPercent.textContent = percent + '%';
+                        statusEl.textContent = `กำลังตรวจสอบรายการที่ ${i+1} จาก ${importData.data.length}`;
+                        
+                        try {
+                            if (!item.id || !item.name) {
+                                skippedItems.push(item.name || "ไม่มีชื่อ");
+                                continue;
+                            }
+                            
+                            if (existingIds.has(item.id)) {
+                                // ถ้ามี ID ซ้ำ ให้ถามว่าจะทำอย่างไร
+                                const existingItem = existingData.find(d => d.id === item.id);
+                                const mergeChoice = await showMergeDialog(item.name, existingItem.name);
+                                
+                                if (mergeChoice === 'skip') {
+                                    skippedItems.push(item.name);
+                                } else if (mergeChoice === 'keep_both') {
+                                    // สร้าง ID ใหม่เพื่อเก็บทั้งสองวิชา
+                                    const newId = item.id + '_imported_' + Date.now();
+                                    item.id = newId;
+                                    item.updatedAt = new Date().toISOString();
+                                    await dbOp.save(item);
+                                    mergedItems.push(item.name + " (ID ใหม่)");
+                                } else if (mergeChoice === 'replace') {
+                                    // แทนที่ข้อมูลเดิม
+                                    item.updatedAt = new Date().toISOString();
+                                    await dbOp.save(item);
+                                    mergedItems.push(item.name + " (แทนที่)");
+                                }
+                            } else {
+                                // ไม่มี ID ซ้ำ บันทึกได้เลย
+                                item.updatedAt = new Date().toISOString();
+                                await dbOp.save(item);
+                                importedItems.push(item.name);
+                            }
+                        } catch (e) {
+                            console.warn("Failed to import item:", item, e);
+                            skippedItems.push(item.name || "Unknown");
+                        }
+                        
+                        // ให้เบราว์เซอร์ได้หายใจ
+                        if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                }
+                
+                // ซื้อ progress bar
+                progressEl.style.display = 'none';
+                
+                await refreshUI();
+                
+                // แสดงผลสรุป
+                showImportSummary(importedItems.length, mergedItems.length, skippedItems.length, importMode);
+                
+            } catch(e) { 
+                console.error("Import parse error:", e);
+                progressEl.style.display = 'none';
+                alert("❌ ไฟล์ไม่ถูกต้องหรือเสียหาย"); 
+            }
+        };
+        reader.readAsText(input.files[0]);
+        input.value = '';
+    }
+
+    // ===============================
+    // IMPORT DIALOG FUNCTIONS
+    // ===============================
+    function showImportDialog(newCount, existingCount) {
+        return new Promise((resolve) => {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 100000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                width: 500px;
+                max-width: 90%;
+                font-family: 'Kanit', sans-serif;
+            `;
+            
+            content.innerHTML = `
+                <h3 style="margin-top:0; color:var(--primary);">📥 เลือกโหมดการ Import</h3>
+                <div style="margin:20px 0;">
+                    <p>พบข้อมูลในระบบ: <strong>${existingCount}</strong> รายการ</p>
+                    <p>ข้อมูลที่จะนำเข้า: <strong>${newCount}</strong> รายการ</p>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:15px; margin:25px 0;">
+                    <button id="btnMerge" style="
+                        padding:15px;
+                        background:#f0f9ff;
+                        border:2px solid var(--primary);
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-family:'Kanit';
+                        text-align:left;
+                    ">
+                        <div style="font-weight:bold; color:var(--primary);">🔄 ผสานข้อมูล (Merge)</div>
+                        <div style="font-size:0.9rem; color:#64748b;">
+                            • เพิ่มวิชาใหม่จากไฟล์ import<br>
+                            • เก็บข้อมูลเดิมไว้ทั้งหมด<br>
+                            • ถ้ามีวิชาซ้ำ จะถามว่าจะทำอย่างไร
+                        </div>
+                    </button>
+                    
+                    <button id="btnReplace" style="
+                        padding:15px;
+                        background:#fef2f2;
+                        border:2px solid var(--danger);
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-family:'Kanit';
+                        text-align:left;
+                    ">
+                        <div style="font-weight:bold; color:var(--danger);">🔄 แทนที่ข้อมูลทั้งหมด (Replace)</div>
+                        <div style="font-size:0.9rem; color:#64748b;">
+                            • ลบข้อมูลเดิมทั้งหมด<br>
+                            • นำเข้าข้อมูลจากไฟล์ใหม่<br>
+                            • เหมาะสำหรับการกู้คืนระบบ
+                        </div>
+                    </button>
+                </div>
+                
+                <button id="btnCancel" style="
+                    padding:10px 20px;
+                    background:#e2e8f0;
+                    border:none;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-family:'Kanit';
+                    width:100%;
+                ">ยกเลิก</button>
+            `;
+            
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+            
+            document.getElementById('btnMerge').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve('merge');
+            };
+            
+            document.getElementById('btnReplace').onclick = () => {
+                if (confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบข้อมูลเดิมทั้งหมด (${existingCount} รายการ) และนำเข้าข้อมูลใหม่ (${newCount} รายการ)?`)) {
+                    document.body.removeChild(dialog);
+                    resolve('replace');
+                }
+            };
+            
+            document.getElementById('btnCancel').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve(null);
+            };
+        });
+    }
+
+    function showMergeDialog(newItemName, existingItemName) {
+        return new Promise((resolve) => {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 100000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 25px;
+                border-radius: 15px;
+                width: 450px;
+                max-width: 90%;
+                font-family: 'Kanit', sans-serif;
+            `;
+            
+            content.innerHTML = `
+                <h4 style="margin-top:0; color:var(--warning);">🔄 พบวิชาซ้ำ</h4>
+                <div style="margin:15px 0; padding:15px; background:#f8fafc; border-radius:10px;">
+                    <p><strong>ในระบบ:</strong> ${existingItemName}</p>
+                    <p><strong>ไฟล์ Import:</strong> ${newItemName}</p>
+                </div>
+                
+                <p style="color:#64748b;">เลือกวิธีจัดการ:</p>
+                
+                <div style="display:flex; flex-direction:column; gap:10px; margin:20px 0;">
+                    <button id="btnSkip" style="padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">
+                        ⏭️ ข้าม (เก็บข้อมูลเดิม)
+                    </button>
+                    
+                    <button id="btnKeepBoth" style="padding:12px; background:#f0f9ff; border:1px solid var(--primary); border-radius:8px; cursor:pointer;">
+                        ➕ เก็บทั้งสองวิชา (สร้าง ID ใหม่)
+                    </button>
+                    
+                    <button id="btnReplace" style="padding:12px; background:#fef2f2; border:1px solid var(--danger); border-radius:8px; cursor:pointer;">
+                        🔄 แทนที่ด้วยข้อมูลใหม่
+                    </button>
+                </div>
+                
+                <small style="color:#94a3b8;">* การเลือกนี้จะใช้กับวิชานี้เท่านั้น</small>
+            `;
+            
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+            
+            document.getElementById('btnSkip').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve('skip');
+            };
+            
+            document.getElementById('btnKeepBoth').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve('keep_both');
+            };
+            
+            document.getElementById('btnReplace').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve('replace');
+            };
+        });
+    }
+
+    function showImportSummary(imported, merged, skipped, mode) {
+        const summary = `
+            📊 ผลการ Import (โหมด: ${mode === 'merge' ? 'ผสาน' : 'แทนที่'})
+            
+            ✅ นำเข้าใหม่: ${imported} รายการ
+            🔄 ผสาน/แทนที่: ${merged} รายการ
+            ⏭️ ข้าม: ${skipped} รายการ
+            
+            ${imported + merged > 0 ? '🎉 Import สำเร็จ!' : '⚠️ ไม่มีข้อมูลใหม่ที่นำเข้า'}
+        `;
+        
+        alert(summary); // ✅ แจ้งเตือนเมื่อ Import เสร็จ!
+        
+        // อัพเดท UI
+        refreshUI().then(() => {
+            const statusEl = document.getElementById('dbStatus');
+            if (statusEl) {
+                statusEl.textContent = `✅ Import สำเร็จ: +${imported + merged} items`;
+                statusEl.className = "db-status success";
+                
+                setTimeout(() => {
+                    dbOp.count().then(count => {
+                        statusEl.textContent = `IndexedDB: ${count} items`;
+                        statusEl.className = "db-status";
+                    });
+                }, 3000);
+            }
+        });
+    }
+
+    // ===============================
+    // BATCH IMPORT FUNCTION
+    // ===============================
+    async function batchImport() {
+        // ฟังก์ชันสำหรับ import หลายไฟล์พร้อมกัน
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.json';
+        
+        input.onchange = async function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            if (files.length > 5) {
+                alert(`⚠️ คุณเลือก ${files.length} ไฟล์ มากเกินไป\nโปรดเลือกไม่เกิน 5 ไฟล์`);
+                return;
+            }
+            
+            if (!confirm(`ต้องการนำเข้า ${files.length} ไฟล์พร้อมกันใช่หรือไม่?\nระบบจะผสานข้อมูลจากทุกไฟล์เข้าด้วยกัน`)) {
+                return;
+            }
+            
+            // แสดง progress bar
+            const progressEl = document.getElementById('importProgress');
+            const progressBar = document.getElementById('importProgressBar');
+            const progressPercent = document.getElementById('importPercent');
+            const statusEl = document.getElementById('importStatus');
+            
+            progressEl.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0%';
+            statusEl.textContent = 'กำลังเตรียมข้อมูล...';
+            
+            const existingData = await dbOp.getAll();
+            const existingIds = new Set(existingData.map(item => item.id));
+            
+            let totalImported = 0;
+            let totalSkipped = 0;
+            let fileCount = 0;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const percent = Math.round((i / files.length) * 100);
+                    progressBar.style.width = percent + '%';
+                    progressPercent.textContent = percent + '%';
+                    statusEl.textContent = `กำลังประมวลผลไฟล์ที่ ${i+1} จาก ${files.length}: ${file.name}`;
+                    
+                    const text = await readFileAsText(file);
+                    const importData = JSON.parse(text);
+                    
+                    if (importData.data && Array.isArray(importData.data)) {
+                        fileCount++;
+                        for (const item of importData.data) {
+                            if (item.id && item.name) {
+                                if (!existingIds.has(item.id)) {
+                                    item.updatedAt = new Date().toISOString();
+                                    await dbOp.save(item);
+                                    existingIds.add(item.id);
+                                    totalImported++;
+                                } else {
+                                    totalSkipped++;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Import failed for ${file.name}:`, e);
+                }
+            }
+            
+            // ซื้อ progress bar
+            progressEl.style.display = 'none';
+            
+            await refreshUI();
+            
+            alert(`📦 Batch Import สำเร็จ!\n\n✅ นำเข้าใหม่: ${totalImported} รายการ\n⏭️ ข้าม (ซ้ำ): ${totalSkipped} รายการ\n📁 ประมวลผลไฟล์: ${fileCount}/${files.length} ไฟล์`);
+        };
+        
+        input.click();
+    }
+
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    // ===============================
+    // CORE FUNCTIONS
+    // ===============================
+    async function init() {
+        try {
+            document.getElementById('dataStatus').textContent = "กำลังเตรียมระบบ IndexedDB...";
+            
+            await initDB();
+            
+            try {
+                localStorage.removeItem('KM_SmartHub_Backup_V2');
+                localStorage.removeItem('KM_Storage_Type');
+                localStorage.removeItem('KM_Current_Session');
+            } catch (e) {
+                console.log("No localStorage to clean");
+            }
+            
+            updateStorageInfo();
+            
+            const count = await dbOp.count();
+            document.getElementById('dataStatus').textContent = `พบ ${count} วิชาใน IndexedDB`;
+            
+            if (count === 0) {
+                document.getElementById('dataStatus').innerHTML += "<br><small style='color:var(--warning)'>ไม่มีข้อมูลวิชาในระบบ</small>";
+            }
+            
+            await refreshUI();
+            
+            window.onkeydown = (e) => { 
+                if (e.key === "Escape") exitFullPresentation(); 
+            };
+            
+            document.getElementById('dbStatus').style.display = 'block';
+            document.getElementById('dbStatus').textContent = `IndexedDB: ${count} items`;
+            
+            setInterval(async () => {
+                try {
+                    const count = await dbOp.count();
+                    document.getElementById('dbStatus').textContent = `IndexedDB: ${count} items`;
+                } catch (e) {
+                    console.error("Status update failed:", e);
+                }
+            }, 10000);
+            
+            isInitialized = true;
+            console.log("System initialized successfully with IndexedDB only");
+            
+        } catch (e) {
+            console.error("Initialization failed:", e);
+            document.getElementById('dataStatus').textContent = "❌ ไม่สามารถเชื่อมต่อกับ IndexedDB ได้";
+            document.getElementById('dataStatus').innerHTML += "<br><small style='color:var(--danger)'>โปรดรีเฟรชหน้าจอหรือตรวจสอบเบราว์เซอร์ของคุณ</small>";
+        }
+    }
+
+    function updateStorageInfo() {
+        const infoEl = document.getElementById('storageInfo');
+        infoEl.innerHTML = `<span style="color:#4ade80">✓ IndexedDB พร้อมใช้งาน</span>`;
+    }
+
+    async function refreshUI() {
+        try {
+            const all = await dbOp.getAll();
+            let mf = 0, ss = 0;
+            all.forEach(d => { 
+                if (d.type === 'SS') ss++; 
+                else mf++; 
+            });
+            
+            document.getElementById('countMF').innerText = mf;
+            document.getElementById('countSS').innerText = ss;
+            
+            setCategory(currentCategory);
+            
+        } catch (e) {
+            console.error("Refresh UI failed:", e);
+        }
+    }
+
+    function setCategory(cat) {
+        currentCategory = cat;
+        document.getElementById('kpiMF').classList.toggle('active', cat === 'MF');
+        document.getElementById('kpiSS').classList.toggle('active', cat === 'SS');
+        document.getElementById('tabMF').classList.toggle('active-mf', cat === 'MF');
+        document.getElementById('tabSS').classList.toggle('active-ss', cat === 'SS');
+        renderSidebar();
+    }
+
+    async function renderSidebar() {
+        const list = document.getElementById('subjectList');
+        const qList = document.getElementById('quickNavList');
+        list.innerHTML = ""; 
+        qList.innerHTML = "";
+        
+        try {
+            const all = await dbOp.getAll();
+            const filtered = all.filter(data => (data.type || 'MF') === currentCategory);
+            
+            if (filtered.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.color = '#94a3b8';
+                emptyMsg.style.textAlign = 'center';
+                emptyMsg.style.padding = '20px';
+                emptyMsg.innerHTML = 'ยังไม่มีวิชาในหมวดนี้<br><small>คลิก "เพิ่มวิชาใหม่" เพื่อเริ่มต้น</small>';
+                list.appendChild(emptyMsg);
+            } else {
+                filtered.forEach(data => {
+                    const div = document.createElement('div');
+                    div.className = `subject-item ${data.id === currentActiveId ? 'active' : ''}`;
+                    div.innerHTML = `<span style="flex:1" onclick="loadSubject('${data.id}')">${data.name}</span>
+                        <div class="item-tools"><button style="color:white;background:none;border:none;cursor:pointer;" onclick="deleteSub(event, '${data.id}')">🗑️</button></div>`;
+                    list.appendChild(div);
+
+                    const qDiv = document.createElement('div');
+                    qDiv.className = `nav-item ${data.id === currentActiveId ? 'active' : ''}`;
+                    qDiv.innerText = data.name; 
+                    qDiv.onclick = () => loadSubject(data.id);
+                    qList.appendChild(qDiv);
+                });
+            }
+        } catch (e) {
+            console.error("Render sidebar failed:", e);
+            list.innerHTML = '<div style="color:#ef4444; padding:20px; text-align:center;">⚠️ โหลดข้อมูลล้มเหลว</div>';
+        }
+    }
+
+    async function loadSubject(id) {
+        try {
+            currentActiveId = id;
+            const data = await dbOp.get(id);
+            
+            if (!data) {
+                alert("ไม่พบข้อมูลวิชานี้ใน IndexedDB");
+                return;
+            }
+            
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('contentCard').style.display = 'block';
+            document.getElementById('editorArea').style.display = 'none';
+            document.getElementById('presentationArea').style.display = 'block';
+            document.getElementById('actionBar').style.display = 'flex';
+            
+            document.getElementById('viewTitle').innerText = data.name || "";
+            document.getElementById('viewInstName').innerText = data.instName || "ยังไม่ระบุชื่อ";
+            document.getElementById('viewInstTitle').innerText = data.instTitle || "";
+            document.getElementById('viewCourseType').innerText = data.type === 'SS' ? "หลักสูตร เสาร์-อาทิตย์" : "หลักสูตร จันทร์-ศุกร์";
+            document.getElementById('viewInstImg').src = data.instImg || "";
+            document.getElementById('viewInstImg').style.display = data.instImg ? 'block' : 'none';
+            
+            currentCourseType = data.type || 'MF';
+            
+            const captionsContainer = document.getElementById('imageCaptions');
+            captionsContainer.innerHTML = '';
+            
+            let hasAnyImg = false;
+            
+            for(let i=1; i<=5; i++) {
+                const imgEl = document.getElementById(`viewImage${i}`);
+                const field = i === 1 ? 'contentImg' : `contentImg${i}`;
+                const captionField = `caption${i}`;
+                
+                if(data[field]) {
+                    imgEl.src = data[field];
+                    imgEl.style.display = 'block';
+                    hasAnyImg = true;
+                    
+                    if(data[captionField] && data[captionField].trim() !== '') {
+                        const captionDiv = document.createElement('div');
+                        captionDiv.className = 'caption-item show';
+                        captionDiv.innerHTML = `
+                            <h4>รูปที่ ${i}</h4>
+                            <p>${data[captionField]}</p>
+                        `;
+                        captionsContainer.appendChild(captionDiv);
+                    }
+                } else {
+                    imgEl.style.display = 'none';
+                }
+            }
+            
+            const videoCard = document.getElementById('videoCard');
+            const videoItem = document.getElementById('viewVideo');
+            const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+            const videoCaption = document.getElementById('videoCaption');
+            
+            if(data.video) {
+                videoCard.classList.add('show');
+                videoItem.style.display = 'block';
+                
+                videoItem.innerHTML = `
+                    <div class="video-play-icon">▶️</div>
+                    <video id="videoThumbnail" style="width:100%; height:100%; object-fit:cover;">
+                        <source src="${data.video}" type="${data.videoType || 'video/mp4'}">
+                    </video>
+                `;
+                
+                videoItem.onclick = function() {
+                    videoPlayerContainer.innerHTML = `
+                        <video controls class="video-player" autoplay>
+                            <source src="${data.video}" type="${data.videoType || 'video/mp4'}">
+                            เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                        </video>
+                    `;
+                };
+                
+                videoPlayerContainer.innerHTML = `
+                    <video controls class="video-player">
+                        <source src="${data.video}" type="${data.videoType || 'video/mp4'}">
+                        เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                    </video>
+                `;
+                
+                if(data.captionVideo && data.captionVideo.trim() !== '') {
+                    videoCaption.textContent = data.captionVideo;
+                    videoCaption.style.display = 'block';
+                } else {
+                    videoCaption.style.display = 'none';
+                }
+            } else {
+                videoCard.classList.remove('show');
+                videoItem.style.display = 'none';
+                videoPlayerContainer.innerHTML = '';
+                videoCaption.style.display = 'none';
+            }
+            
+            const descriptionContainer = document.getElementById('subjectDescription');
+            descriptionContainer.innerHTML = '';
+            
+            if(data.text && data.text.trim() !== '') {
+                descriptionContainer.innerHTML = `
+                    <h3>รายละเอียดวิชา</h3>
+                    <p>${data.text.replace(/\n/g, '<br>')}</p>
+                `;
+            } else {
+                descriptionContainer.innerHTML = `
+                    <h3>รายละเอียดวิชา</h3>
+                    <p>ยังไม่มีคำอธิบายวิชา</p>
+                `;
+            }
+            
+            const hasMedia = hasAnyImg || data.video;
+            document.getElementById('imgGallery').style.display = hasMedia ? 'grid' : 'none';
+            document.querySelector('.image-gallery-container').style.display = hasMedia ? 'flex' : 'none';
+            
+            updateCourseBadge();
+            renderSidebar();
+            
+        } catch (e) {
+            console.error("Load subject failed:", e);
+            alert("⚠️ โหลดข้อมูลวิชาล้มเหลว");
+        }
+    }
+
+    function updateCourseBadge() {
+        const badge = document.getElementById('courseBadge');
+        if (currentCourseType === 'MF') {
+            badge.className = 'course-badge mf';
+            badge.textContent = 'หลักสูตร จันทร์-ศุกร์';
+        } else {
+            badge.className = 'course-badge ss';
+            badge.textContent = 'หลักสูตร เสาร์-อาทิตย์';
+        }
+        
+        if (document.body.classList.contains('present-mode')) {
+            badge.style.display = 'block';
+        }
+    }
+
+    // ===============================
+    // EDITOR FUNCTIONS
+    // ===============================
+    function uploadWithProgress(input, progressId) {
+        if(!input.files[0]) return;
+        
+        const progressContainer = document.getElementById(progressId);
+        const progressFill = document.getElementById(progressId + 'Fill');
+        const progressText = document.getElementById(progressId + 'Text');
+        
+        progressContainer.style.display = 'flex';
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15 + 5;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 2000);
+            }
+            
+            progressFill.style.width = progress + '%';
+            progressText.textContent = Math.round(progress) + '%';
+            
+            if (progress < 30) {
+                progressFill.style.backgroundColor = '#ef4444';
+            } else if (progress < 70) {
+                progressFill.style.backgroundColor = '#f59e0b';
+            } else {
+                progressFill.style.backgroundColor = '#10b981';
+            }
+        }, 200);
+    }
+
+    function clearEditorInput() {
+        const fileInputs = ['fInst', 'fContent1', 'fContent2', 'fContent3', 'fContent4', 'fContent5', 'fVideo'];
+        fileInputs.forEach(id => { 
+            const el = document.getElementById(id);
+            if (el) el.value = ""; 
+        });
+        
+        const progressContainers = ['pInst', 'pC1', 'pC2', 'pC3', 'pC4', 'pC5', 'pVideo'];
+        progressContainers.forEach(id => {
+            const container = document.getElementById(id);
+            if (container) container.style.display = 'none';
+            
+            const fill = document.getElementById(id + 'Fill');
+            if (fill) fill.style.width = '0%';
+            
+            const text = document.getElementById(id + 'Text');
+            if (text) text.textContent = '0%';
+        });
+        
+        document.querySelectorAll('.caption-input').forEach(input => {
+            input.value = '';
+        });
+    }
+
+    async function saveData() {
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.innerText = "⏳ กำลังบันทึกลง IndexedDB...";
+        saveBtn.disabled = true;
+
+        try {
+            const subjectName = document.getElementById('editSubjectName').value.trim();
+            if (!subjectName) {
+                alert("กรุณากรอกชื่อวิชา");
+                saveBtn.disabled = false;
+                saveBtn.innerText = "💾 บันทึกลง IndexedDB";
+                return;
+            }
+
+            let data = await dbOp.get(currentActiveId);
+            if (!data) {
+                currentActiveId = 'subject_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                data = { 
+                    id: currentActiveId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+            } else {
+                data.updatedAt = new Date().toISOString();
+            }
+            
+            data.name = subjectName;
+            data.text = document.getElementById('textEditor').value;
+            data.instName = document.getElementById('instNameInput').value.trim();
+            data.instTitle = document.getElementById('instTitleInput').value.trim();
+            data.type = document.getElementById('typeInput').value;
+            
+            data.caption1 = document.getElementById('captionInput1').value.trim();
+            data.caption2 = document.getElementById('captionInput2').value.trim();
+            data.caption3 = document.getElementById('captionInput3').value.trim();
+            data.caption4 = document.getElementById('captionInput4').value.trim();
+            data.caption5 = document.getElementById('captionInput5').value.trim();
+            data.captionVideo = document.getElementById('captionInputVideo').value.trim();
+
+            const readFileAsBase64 = (file) => new Promise((resolve) => { 
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader(); 
+                reader.onloadend = () => resolve(reader.result); 
+                reader.readAsDataURL(file); 
+            });
+
+            const instFile = document.getElementById('fInst').files[0];
+            if (instFile) {
+                data.instImg = await readFileAsBase64(instFile);
+            }
+            
+            const imgFiles = [
+                document.getElementById('fContent1').files[0],
+                document.getElementById('fContent2').files[0],
+                document.getElementById('fContent3').files[0],
+                document.getElementById('fContent4').files[0],
+                document.getElementById('fContent5').files[0]
+            ];
+            
+            for (let i = 0; i < imgFiles.length; i++) {
+                if (imgFiles[i]) {
+                    const fieldName = i === 0 ? 'contentImg' : `contentImg${i + 1}`;
+                    data[fieldName] = await readFileAsBase64(imgFiles[i]);
+                }
+            }
+            
+            const videoFile = document.getElementById('fVideo').files[0];
+            if (videoFile) {
+                if (videoFile.type.startsWith('video/')) {
+                    data.video = await readFileAsBase64(videoFile);
+                    data.videoType = videoFile.type;
+                } else {
+                    alert("⚠️ กรุณาเลือกไฟล์วีดีโอที่ถูกต้อง (เช่น MP4, WebM)");
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = "💾 บันทึกลง IndexedDB";
+                    return;
+                }
+            }
+
+            console.log('กำลังบันทึกข้อมูล:', data);
+            await dbOp.save(data);
+            
+            saveBtn.innerText = "✅ บันทึกลง IndexedDB สำเร็จ";
+            setTimeout(() => {
+                saveBtn.innerText = "💾 บันทึกลง IndexedDB";
+                saveBtn.disabled = false;
+            }, 1500);
+            
+            clearEditorInput();
+            await refreshUI();
+            await loadSubject(currentActiveId);
+            
+        } catch (e) {
+            console.error("Save data failed:", e);
+            alert("❌ เกิดข้อผิดพลาดในการบันทึกลง IndexedDB: " + e.message);
+            saveBtn.disabled = false;
+            saveBtn.innerText = "💾 บันทึกลง IndexedDB";
+        }
+    }
+
+    async function addNewSubject() {
+        const n = prompt("ชื่อวิชาใหม่:");
+        if (n && n.trim()) {
+            const newId = 'subject_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            await dbOp.save({ 
+                id: newId, 
+                name: n.trim(), 
+                type: currentCategory,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+            
+            await refreshUI(); 
+            await loadSubject(newId);
+        }
+    }
+
+    async function deleteSub(e, id) { 
+        e.stopPropagation(); 
+        if (confirm(`ยืนยันการลบวิชานี้จาก IndexedDB?`)) { 
+            await dbOp.delete(id); 
+            
+            if (currentActiveId === id) {
+                currentActiveId = "";
+                document.getElementById('welcome').style.display = 'block';
+                document.getElementById('contentCard').style.display = 'none';
+            }
+            
+            await refreshUI();
+        } 
+    }
+
+    // ===============================
+    // IMPORT/EXPORT FUNCTIONS
+    // ===============================
+    function importTrigger() { 
+        document.getElementById('fileInput').click(); 
+    }
+
+    // ===============================
+    // DATABASE INFO
+    // ===============================
+    async function showDBInfo() {
+        try {
+            const all = await dbOp.getAll();
+            const count = all.length;
+            
+            let mf = 0, ss = 0;
+            all.forEach(d => { 
+                if (d.type === 'SS') ss++; 
+                else mf++; 
+            });
+            
+            let totalSize = 0;
+            all.forEach(item => {
+                const jsonSize = JSON.stringify(item).length;
+                totalSize += jsonSize;
+            });
+            
+            const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+            
+            alert(`📊 ข้อมูล IndexedDB\n\n` +
+                  `• รวมวิชาทั้งหมด: ${count} รายการ\n` +
+                  `• หลักสูตร จันทร์-ศุกร์: ${mf} รายการ\n` +
+                  `• หลักสูตร เสาร์-อาทิตย์: ${ss} รายการ\n` +
+                  `• ขนาดโดยประมาณ: ${sizeMB} MB\n` +
+                  `• ฐานข้อมูล: ${DB_NAME} (v${DB_VERSION})\n` +
+                  `• Object Store: ${STORE_NAME}`);
+        } catch (e) {
+            console.error("Show DB info failed:", e);
+            alert("ไม่สามารถดึงข้อมูล IndexedDB ได้");
+        }
+    }
+
+    // ===============================
+    // PRESENTATION FUNCTIONS
+    // ===============================
+    function enterFullPresentation() { 
+        document.documentElement.requestFullscreen().catch(()=>{}); 
+        document.body.classList.add('present-mode');
+        
+        if (currentCourseType === 'MF') {
+            document.body.classList.add('mf-bg');
+            document.body.classList.remove('ss-bg');
+        } else {
+            document.body.classList.add('ss-bg');
+            document.body.classList.remove('mf-bg');
+        }
+        
+        // ซื้อ course-badge ในโหมดนำเสนอ
+        document.getElementById('courseBadge').style.display = 'none';
+    }
+    
+    function exitFullPresentation() { 
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+        document.body.classList.remove('present-mode');
+        document.body.classList.remove('mf-bg', 'ss-bg');
+        document.getElementById('courseBadge').style.display = 'none';
+    }
+    
+    async function enableEditMode() {
+        clearEditorInput();
+        document.getElementById('presentationArea').style.display = 'none';
+        document.getElementById('actionBar').style.display = 'none';
+        document.getElementById('editorArea').style.display = 'block';
+        
+        const data = await dbOp.get(currentActiveId);
+        if (!data) {
+            alert("ไม่พบข้อมูลวิชาใน IndexedDB");
+            return;
+        }
+        
+        document.getElementById('editSubjectName').value = data.name || "";
+        document.getElementById('textEditor').value = data.text || "";
+        document.getElementById('instNameInput').value = data.instName || "";
+        document.getElementById('instTitleInput').value = data.instTitle || "";
+        document.getElementById('typeInput').value = data.type || 'MF';
+        
+        document.getElementById('captionInput1').value = data.caption1 || '';
+        document.getElementById('captionInput2').value = data.caption2 || '';
+        document.getElementById('captionInput3').value = data.caption3 || '';
+        document.getElementById('captionInput4').value = data.caption4 || '';
+        document.getElementById('captionInput5').value = data.caption5 || '';
+        document.getElementById('captionInputVideo').value = data.captionVideo || '';
+    }
+
+    function cancelEdit() { 
+        loadSubject(currentActiveId); 
+    }
+
+    // ===============================
+    // DEBUG FUNCTION
+    // ===============================
+    async function debugData() {
+        try {
+            const all = await dbOp.getAll();
+            console.log('ข้อมูลทั้งหมดใน IndexedDB:', all);
+            alert(`พบ ${all.length} รายการใน IndexedDB\nดูข้อมูลใน Console (F12)`);
+        } catch (e) {
+            console.error('Debug error:', e);
+        }
+    }
+
+    // ===============================
+    // WINDOW EVENT HANDLERS
+    // ===============================
+    window.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            exitFullPresentation();
+        }
+    });
+
+    // ===============================
+    // INITIALIZE SYSTEM
+    // ===============================
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

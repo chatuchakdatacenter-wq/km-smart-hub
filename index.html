@@ -1,0 +1,396 @@
+# index.html
+
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KM Smart Hub</title>
+
+<style>
+
+:root{
+--primary:#007A5E;
+--primary2:#00A884;
+--dark:#031914;
+--glass:rgba(255,255,255,.08);
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tahoma,sans-serif;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#031914;
+}
+
+body{
+position:relative;
+}
+
+/* HOME SCREEN */
+
+#homeScreen{
+position:fixed;
+inset:0;
+background:
+linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.7)),
+url('./home.jpg');
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:10;
+transition:1s ease;
+}
+
+.portal-box{
+width:min(1100px,100%);
+background:rgba(0,0,0,.35);
+backdrop-filter:blur(14px);
+border:1px solid rgba(255,255,255,.08);
+border-radius:28px;
+padding:50px;
+box-shadow:0 20px 60px rgba(0,0,0,.5);
+color:white;
+}
+
+.top-badge{
+display:inline-block;
+padding:8px 14px;
+border-radius:999px;
+background:rgba(0,168,132,.18);
+border:1px solid rgba(0,168,132,.4);
+font-size:13px;
+margin-bottom:20px;
+}
+
+.portal-title{
+font-size:56px;
+font-weight:bold;
+line-height:1.1;
+margin-bottom:18px;
+}
+
+.portal-desc{
+font-size:18px;
+line-height:1.8;
+opacity:.92;
+max-width:850px;
+}
+
+.kpi-grid{
+margin-top:35px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:18px;
+}
+
+.kpi-card{
+background:var(--glass);
+border:1px solid rgba(255,255,255,.08);
+border-radius:22px;
+padding:26px;
+transition:.3s;
+}
+
+.kpi-card:hover{
+transform:translateY(-5px);
+background:rgba(255,255,255,.12);
+}
+
+.kpi-number{
+font-size:34px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.kpi-label{
+font-size:15px;
+opacity:.88;
+line-height:1.6;
+}
+
+.action-area{
+margin-top:40px;
+display:flex;
+flex-wrap:wrap;
+gap:18px;
+align-items:center;
+}
+
+.enter-btn{
+background:linear-gradient(135deg,var(--primary),var(--primary2));
+color:white;
+border:none;
+padding:18px 34px;
+font-size:18px;
+font-weight:bold;
+border-radius:18px;
+cursor:pointer;
+transition:.25s;
+box-shadow:0 10px 30px rgba(0,168,132,.3);
+}
+
+.enter-btn:hover{
+transform:scale(1.04);
+}
+
+.mini-text{
+font-size:14px;
+opacity:.8;
+}
+
+/* IFRAME */
+
+#kmFrame{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+border:none;
+display:none;
+background:#fff;
+}
+
+/* LOADER */
+
+#loader{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+display:flex;
+align-items:center;
+justify-content:center;
+opacity:0;
+pointer-events:none;
+transition:.35s;
+z-index:999;
+}
+
+#loader.show{
+opacity:1;
+pointer-events:auto;
+}
+
+.loader-circle{
+width:75px;
+height:75px;
+border-radius:50%;
+border:6px solid rgba(255,255,255,.12);
+border-top:6px solid #00A884;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+100%{
+transform:rotate(360deg);
+}
+}
+
+/* FLOAT HOME BUTTON */
+
+#homeBtn{
+position:fixed;
+right:20px;
+bottom:20px;
+z-index:9999;
+background:linear-gradient(135deg,var(--primary),var(--primary2));
+color:white;
+border:none;
+padding:14px 18px;
+border-radius:16px;
+font-weight:bold;
+cursor:pointer;
+display:none;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+#homeBtn:hover{
+transform:scale(1.05);
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.portal-box{
+padding:30px 24px;
+}
+
+.portal-title{
+font-size:36px;
+}
+
+.portal-desc{
+font-size:15px;
+}
+
+.enter-btn{
+width:100%;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="homeScreen">
+
+<div class="portal-box">
+
+<div class="top-badge">
+KM SMART HUB • เขตจตุจักร
+</div>
+
+<div class="portal-title">
+Knowledge Management<br>
+Smart Hub
+</div>
+
+<div class="portal-desc">
+ศูนย์กลางองค์ความรู้ดิจิทัลสำหรับบริหารจัดการข้อมูล ระบบ KM และระบบสนับสนุนการดำเนินงานภายในองค์กร รองรับการใช้งานทั้ง Desktop และ Mobile
+</div>
+
+<div class="kpi-grid">
+
+<div class="kpi-card">
+<div class="kpi-number">24/7</div>
+<div class="kpi-label">
+รองรับการใช้งานออนไลน์ตลอดเวลา
+</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-number">Realtime</div>
+<div class="kpi-label">
+เข้าถึงข้อมูลและเอกสารได้แบบทันที
+</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-number">Cloud</div>
+<div class="kpi-label">
+รองรับการใช้งานผ่านระบบออนไลน์
+</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-number">Responsive</div>
+<div class="kpi-label">
+รองรับมือถือ แท็บเล็ต และคอมพิวเตอร์
+</div>
+</div>
+
+</div>
+
+<div class="action-area">
+
+<button class="enter-btn" onclick="openKM()">
+เข้าสู่ระบบ KM Smart Hub
+</button>
+
+<div class="mini-text">
+Bangkok Metropolitan Administration • Chatuchak District
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<iframe id="kmFrame" src="km_hub.html"></iframe>
+
+<div id="loader">
+<div class="loader-circle"></div>
+</div>
+
+<button id="homeBtn" onclick="backHome()">
+🏠 กลับหน้าหลัก
+</button>
+
+<script>
+
+const frame=document.getElementById('kmFrame');
+const home=document.getElementById('homeScreen');
+const loader=document.getElementById('loader');
+const homeBtn=document.getElementById('homeBtn');
+
+function openKM(){
+
+loader.classList.add('show');
+
+setTimeout(()=>{
+
+home.style.opacity='0';
+
+setTimeout(()=>{
+home.style.display='none';
+},700);
+
+frame.style.display='block';
+homeBtn.style.display='block';
+
+loader.classList.remove('show');
+
+},800);
+
+}
+
+function backHome(){
+
+frame.style.display='none';
+home.style.display='flex';
+home.style.opacity='1';
+homeBtn.style.display='none';
+
+}
+
+</script>
+
+</body>
+</html>
+```
+
+---
+
+# โครงสร้างไฟล์
+
+```text
+/km-hub
+│
+├── index.html
+├── home.jpg
+└── km_hub.html
+```
+
+---
+
+# วิธีใช้งาน
+
+1. เอาโค้ดด้านบนไปวางใน `index.html`
+2. วาง `km_hub.html` ไว้โฟลเดอร์เดียวกัน
+3. วางรูป `home.jpg`
+4. Upload ขึ้น GitHub
+5. Commit changes
+6. เปิด GitHub Pages
+
+ระบบจะ:
+
+* มีหน้า Home แบบองค์กร
+* ปุ่มเข้าสู่ระบบ
+* โหลด km_hub.html อัตโนมัติ
+* รองรับมือถือ
+* มีปุ่มกลับหน้าหลัก
