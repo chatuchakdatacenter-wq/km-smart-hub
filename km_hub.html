@@ -2,689 +2,543 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KM Smart Hub - รูปภาพวิชา</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>KM Smart Hub - ระบบจัดการองค์ความรู้</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Kanit:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --bg: #f8fafc;
-            --sidebar-bg: #0f172a;
-            --card-mf: #3b82f6;
-            --card-ss: #f59e0b;
-        }
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            scroll-behavior: smooth;
         }
         body {
             font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            display: flex;
+            background: #f0f4f8;
             height: 100vh;
-            background: var(--bg);
+            display: flex;
             overflow: hidden;
         }
-        .exit-present {
-            display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--danger);
-            color: white;
-            z-index: 10001;
-            padding: 12px 25px;
-            border-radius: 50px;
-            border: 2px solid white;
-            cursor: pointer;
-            font-family: 'Kanit';
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        #sidebar {
-            width: 340px;
-            background: var(--sidebar-bg);
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #1e293b;
             color: white;
             display: flex;
             flex-direction: column;
-            z-index: 100;
             flex-shrink: 0;
+            z-index: 10;
         }
         .sidebar-header {
             padding: 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #334155;
         }
-        .kpi-wrapper {
-            padding: 10px 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+        .sidebar-header h2 {
+            font-family: 'Kanit';
+            color: #38bdf8;
+        }
+        .kpi-box {
+            padding: 15px;
+            display: flex;
+            gap: 15px;
         }
         .kpi-card {
-            padding: 8px 5px;
-            border-radius: 10px;
+            flex: 1;
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: 0.3s;
-            text-align: center;
-            color: white;
-        }
-        .kpi-card h5 {
-            margin: 0;
-            font-size: 0.7rem;
-            opacity: 0.9;
-        }
-        .kpi-card div {
-            font-size: 1.2rem !important;
-            font-weight: bold;
+            transition: 0.2s;
         }
         .kpi-card.active {
-            border-color: white;
-            box-shadow: 0 0 10px rgba(255,255,255,0.2);
-            transform: scale(1.02);
+            border-color: #38bdf8;
+            background: #1e293b;
         }
-        .subject-container {
+        .kpi-card h5 {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .kpi-card .count {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .subject-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 15px;
+            padding: 10px;
         }
         .subject-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
+            background: #0f172a;
+            padding: 14px;
             margin-bottom: 8px;
             border-radius: 10px;
             cursor: pointer;
-            background: rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
             transition: 0.2s;
         }
         .subject-item.active {
-            background: var(--primary);
+            background: #3b82f6;
         }
-        .item-tools {
-            display: flex;
-            gap: 8px;
-            opacity: 0;
+        .subject-item:hover {
+            background: #334155;
         }
-        .subject-item:hover .item-tools {
-            opacity: 1;
+        .btn-danger-sm {
+            background: none;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            font-size: 1.2rem;
         }
-        .data-management {
+        .data-panel {
             padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3);
+            border-top: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        .btn-data {
+        .data-panel button {
             width: 100%;
             padding: 10px;
             border-radius: 8px;
             border: none;
-            cursor: pointer;
             font-family: 'Kanit';
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            transition: transform 0.2s;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
         }
-        .btn-data:hover {
+        .data-panel button:hover {
             transform: translateY(-2px);
         }
-        .btn-json-load {
-            background: #10b981;
-            color: white;
-        }
-        .btn-json-load:hover {
-            background: #059669;
-        }
-        #main {
+        .btn-scan { background: #10b981; color: white; }
+        .btn-export { background: #2563eb; color: white; }
+        .btn-import { background: #64748b; color: white; }
+        .btn-clear { background: #ef4444; color: white; }
+
+        /* Main Content */
+        .main-content {
             flex: 1;
+            padding: 30px;
             overflow-y: auto;
-            padding: 40px;
-            position: relative;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
         }
-        .content-card {
+        .card {
             background: white;
-            padding: 45px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            max-width: 1200px;
-            width: 90%;
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            max-width: 1100px;
+            margin: 0 auto;
         }
-        .course-image-view {
+        .welcome-area {
+            text-align: center;
+            padding: 70px 20px;
+            color: #475569;
+        }
+        .course-view {
             text-align: center;
         }
-        .course-image-view img {
+        .course-view img {
             max-width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-        }
-        .btn {
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            font-family: 'Kanit';
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-        .db-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border-radius: 5px;
-            font-size: 0.7rem;
-            z-index: 9999;
-            display: none;
-        }
-        .db-status.success {
-            background: #10b981;
-        }
-        .db-status.warning {
-            background: #f59e0b;
-        }
-        .db-status.error {
-            background: #ef4444;
-        }
-        .instructor-card {
-            background: #f8fafc;
-            padding: 20px;
             border-radius: 20px;
-            text-align: center;
-            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
         }
         .action-bar {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 25px;
         }
-        .welcome-box {
-            text-align: center;
-            color: #94a3b8;
-            padding: 50px;
-        }
-        .welcome-box h1 {
+        .btn-action {
+            background: #f1f5f9;
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: none;
             font-family: 'Kanit';
-            color: var(--primary);
+            cursor: pointer;
         }
-        #editorArea {
-            margin-top: 20px;
-            padding: 20px;
+        .edit-form {
             background: #f8fafc;
-            border-radius: 16px;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 20px;
         }
-        #editSubjectName {
+        .edit-form input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-family: 'Sarabun';
-            font-size: 1rem;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        .db-badge {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: #1e293b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            z-index: 99;
+        }
+        .subject-title {
+            font-family: 'Kanit';
+            margin-bottom: 10px;
+        }
+        .fullscreen-mode .sidebar,
+        .fullscreen-mode .db-badge {
+            display: none !important;
+        }
+        .fullscreen-mode .main-content {
+            padding: 0;
+        }
+        .fullscreen-mode .card {
+            border-radius: 0;
+            padding: 30px;
+            max-width: 100%;
         }
     </style>
 </head>
 <body>
 
-<div class="db-status" id="dbStatus">IndexedDB: Connected</div>
-<button class="exit-present" onclick="exitFullPresentation()">❌ จบการนำเสนอ (ESC)</button>
-
-<!-- Sidebar -->
-<div id="sidebar">
+<div class="sidebar">
     <div class="sidebar-header">
-        <h2 style="font-family:'Kanit'; color:#38bdf8; margin:0;">KM SMART HUB</h2>
-        <div id="storageInfo" style="font-size:0.7rem; color:#94a3b8; margin-top:5px;">✓ พร้อมใช้งาน</div>
+        <h2>📚 KM SMART HUB</h2>
+        <div style="font-size:0.7rem; color:#94a3b8;">ระบบจัดการองค์ความรู้</div>
     </div>
-
-    <button class="btn" style="background:var(--success); color:white; margin:15px; justify-content:center;" onclick="addNewSubject()">+ เพิ่มวิชาใหม่</button>
-
-    <div class="kpi-wrapper">
-        <div class="kpi-card active" id="kpiMF" style="background:var(--card-mf);" onclick="setCategory('MF')">
-            <h5>จันทร์ - ศุกร์</h5>
-            <div id="countMF">0</div>
+    <button style="background:#10b981; color:white; margin:15px; padding:12px; border-radius:40px; border:none; font-family:'Kanit'; font-weight:bold; cursor:pointer;" onclick="createNewCourse()">+ เพิ่มวิชาใหม่</button>
+    
+    <div class="kpi-box">
+        <div class="kpi-card" id="kpiMF" onclick="filterCategory('MF')">
+            <h5>📅 จันทร์-ศุกร์</h5>
+            <div class="count" id="countMF">0</div>
         </div>
-        <div class="kpi-card" id="kpiSS" style="background:var(--card-ss);" onclick="setCategory('SS')">
-            <h5>เสาร์ - อาทิตย์</h5>
-            <div id="countSS">0</div>
+        <div class="kpi-card" id="kpiSS" onclick="filterCategory('SS')">
+            <h5>🌙 เสาร์-อาทิตย์</h5>
+            <div class="count" id="countSS">0</div>
         </div>
     </div>
 
-    <div id="subjectList" class="subject-container"></div>
-
-    <div class="data-management">
-        <button class="btn-data btn-json-load" onclick="scanImagesFromFolder()">📂 สแกนรูปภาพจากโฟลเดอร์</button>
-        <button class="btn-data" style="background:var(--primary); color:white;" onclick="exportData()">📤 Export ข้อมูล</button>
-        <button class="btn-data" style="background:var(--secondary); color:white;" onclick="importTrigger()">📥 Import ข้อมูล</button>
-        <button class="btn-data" style="background:#ef4444; color:white;" onclick="clearAllData()">🗑️ ล้างข้อมูลทั้งหมด</button>
+    <div class="subject-list" id="subjectList">
+        <div style="color:#94a3b8; text-align:center; padding:20px;">✨ กด "สแกนรูปภาพ" เพื่อเริ่มต้น</div>
     </div>
-    <input type="file" id="fileInput" style="display:none" accept=".json" onchange="processImport(this)">
+
+    <div class="data-panel">
+        <button class="btn-scan" onclick="scanCourses()">📂 สแกนรูปภาพจากโฟลเดอร์</button>
+        <button class="btn-export" onclick="exportAllData()">📤 Export ข้อมูล (.json)</button>
+        <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Import ข้อมูล (.json)</button>
+        <button class="btn-clear" onclick="clearDatabase()">🗑️ ล้างข้อมูลทั้งหมด</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+    </div>
 </div>
 
-<!-- Main Content -->
-<div id="main">
-    <div id="welcome" class="welcome-box">
+<div class="main-content">
+    <div id="welcomeScreen" class="card welcome-area">
         <h1>📸 ยินดีต้อนรับ</h1>
-        <p>คลิกปุ่ม "📂 สแกนรูปภาพจากโฟลเดอร์" เพื่อโหลดรายวิชาทั้งหมด</p>
-        <p style="font-size:0.9rem;">หรือเลือกวิชาจากเมนูด้านซ้าย</p>
+        <p>กรุณากดปุ่ม <strong>"📂 สแกนรูปภาพจากโฟลเดอร์"</strong> ด้านล่างซ้าย เพื่อโหลดรายวิชาทั้งหมด</p>
+        <p style="margin-top:20px; font-size:0.9rem;">⭐ ระบบจะทำการสร้างรายการวิชาจากไฟล์รูปภาพในโฟลเดอร์ courses-img โดยอัตโนมัติ</p>
     </div>
 
-    <div class="content-card" id="contentCard" style="display:none;">
+    <div id="coursePanel" class="card" style="display: none;">
         <div class="action-bar">
-            <button class="btn" style="background: #1e293b; color: white;" onclick="enterFullPresentation()">🖥️ นำเสนอ</button>
-            <button class="btn" style="background: #e2e8f0;" onclick="enableEditMode()">✏️ แก้ไขชื่อ/รูป</button>
+            <button class="btn-action" onclick="toggleFullscreen()">🖥️ เปิดแบบเต็มจอ</button>
+            <button class="btn-action" onclick="enableEditMode()">✏️ แก้ไขข้อมูล</button>
         </div>
-
-        <div class="instructor-card" id="instructorArea" style="display:none;">
-            <div>
-                <h3 id="viewTitle"></h3>
-                <p id="viewCourseType"></p>
+        <div id="displayArea">
+            <h2 id="courseName" style="font-family:'Kanit'; color:#1e293b;"></h2>
+            <p id="courseType" style="color:#64748b; margin-bottom: 20px;"></p>
+            <div class="course-view">
+                <img id="courseImage" style="max-width:100%; border-radius:20px;">
             </div>
         </div>
-
-        <div class="course-image-view">
-            <img id="courseMainImage" style="max-width:100%; border-radius:16px;">
-        </div>
-
-        <div id="editorArea" style="display:none;">
-            <h4>✏️ แก้ไขข้อมูลวิชา</h4>
-            <input type="text" id="editSubjectName" placeholder="ชื่อวิชา">
-            <br><br>
-            <label>เปลี่ยนรูปภาพ:</label>
-            <input type="file" id="editImageFile" accept="image/*">
-            <br><br>
-            <button class="btn" style="background:var(--success); color:white;" onclick="saveEditedSubject()">💾 บันทึก</button>
-            <button class="btn" style="background:#cbd5e1;" onclick="cancelEdit()">ยกเลิก</button>
+        <div id="editArea" style="display: none;">
+            <h3>✏️ แก้ไขรายวิชา</h3>
+            <input type="text" id="editName" placeholder="ชื่อวิชา" style="width:100%; padding:12px; margin:10px 0; border-radius:12px; border:1px solid #ccc;">
+            <input type="file" id="editImageUpload" accept="image/*">
+            <div style="display: flex; gap:10px; margin-top:15px;">
+                <button class="btn-action" style="background:#10b981; color:white;" onclick="saveEdit()">💾 บันทึก</button>
+                <button class="btn-action" onclick="cancelEdit()">ยกเลิก</button>
+            </div>
         </div>
     </div>
 </div>
+<div class="db-badge" id="dbStatus">💾 IndexedDB: 0 รายการ</div>
 
 <script>
-    // ===============================
-    // DATABASE CONFIGURATION
-    // ===============================
-    const DB_NAME = 'KM_SmartHub_DB';
-    const STORE_NAME = 'subjects';
-    const DB_VERSION = 3;
-    let db;
-    let currentCategory = 'MF';
-    let currentActiveId = "";
+    // ---------- ตั้งค่า IndexedDB ----------
+    const DB_NAME = 'KMSmartHub';
+    const STORE_NAME = 'courses';
+    let db = null;
+    let currentFilter = 'MF';
+    let currentCourseId = null;
 
-    // ===============================
-    // INDEXEDDB OPERATIONS
-    // ===============================
-    const dbOp = {
-        save: (data) => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).put(data);
-            tx.oncomplete = () => resolve();
-            tx.onerror = (e) => reject(e.target.error);
-        }),
-        get: (id) => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const req = tx.objectStore(STORE_NAME).get(id);
-            req.onsuccess = () => resolve(req.result || null);
-            req.onerror = (e) => reject(e.target.error);
-        }),
-        getAll: () => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const req = tx.objectStore(STORE_NAME).getAll();
-            req.onsuccess = () => resolve(req.result || []);
-            req.onerror = (e) => reject(e.target.error);
-        }),
-        delete: (id) => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).delete(id);
-            tx.oncomplete = () => resolve();
-            tx.onerror = (e) => reject(e.target.error);
-        }),
-        count: () => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const req = tx.objectStore(STORE_NAME).count();
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = (e) => reject(e.target.error);
-        }),
-        clearAll: () => new Promise((resolve, reject) => {
-            if (!db) { reject(new Error("Database not initialized")); return; }
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).clear();
-            tx.oncomplete = () => resolve();
-            tx.onerror = (e) => reject(e.target.error);
-        })
-    };
-
-    // ===============================
-    // INITIALIZE DATABASE
-    // ===============================
-    async function initDB() {
+    // เปิด Database
+    function openDB() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                }
-            };
-            request.onsuccess = (e) => {
-                db = e.target.result;
+            const request = indexedDB.open(DB_NAME, 2);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
                 resolve(db);
             };
-            request.onerror = (e) => reject(e.target.error);
+            request.onupgradeneeded = (event) => {
+                const dbRef = event.target.result;
+                if (!dbRef.objectStoreNames.contains(STORE_NAME)) {
+                    dbRef.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                }
+            };
         });
     }
 
-    // ===============================
-    // 📂 สแกนรูปภาพจากโฟลเดอร์ courses-img
-    // ===============================
-    async function scanImagesFromFolder() {
-        const statusDiv = document.getElementById('dbStatus');
-        statusDiv.style.display = 'block';
-        statusDiv.textContent = '⏳ กำลังสแกนรูปภาพ...';
-        statusDiv.className = 'db-status warning';
+    // Helper DB functions
+    async function getAllCourses() {
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.getAll();
+            req.onsuccess = () => res(req.result || []);
+            req.onerror = () => rej(req.error);
+        });
+    }
 
-        // 🔧 แก้ไขรายชื่อนี้ให้ตรงกับไฟล์รูปภาพของคุณ!
-        const imageFiles = [
-            "basic-computer.jpg",
-            "computer-repair.jpg",
-            "graphic-design.jpg",
-            "flower-arrangement-mf.jpg",
-            "scented-clay-flower.jpg",
-            "haircut-men.jpg",
-            "womens-sewing.jpg",
-            "batik-tiedye.jpg",
-            "herbal-processing.jpg",
-            "nail-art.jpg",
-            "contemporary-craft.jpg",
-            "beauty-women.jpg",
-            "beautician.jpg",
-            "applied-astrology.jpg",
-            "thai-snacks-desserts.jpg",
-            "homemade-cafe.jpg",
-            "fancy-candle.jpg",
-            "patchwork-quilting.jpg"
-        ];
+    async function saveCourse(course) {
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.put(course);
+            req.onsuccess = () => res();
+            req.onerror = () => rej(req.error);
+        });
+    }
 
-        const basePath = '/km-smart-hub/courses-img/';
-        let importedCount = 0;
-        let skippedCount = 0;
+    async function deleteCourseById(id) {
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.delete(id);
+            req.onsuccess = () => res();
+            req.onerror = () => rej(req.error);
+        });
+    }
 
-        for (let fileName of imageFiles) {
-            let name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '').replace(/-/g, ' ');
-            let type = 'MF';
-            if (fileName.includes('-ss')) type = 'SS';
-            else if (fileName.includes('-mf')) type = 'MF';
-            
-            const id = 'img_' + fileName.replace(/\./g, '_');
-            const existing = await dbOp.get(id);
-            
-            if (!existing) {
-                await dbOp.save({
-                    id: id,
-                    name: name,
-                    type: type,
-                    imageUrl: basePath + fileName,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                });
-                importedCount++;
-            } else {
-                skippedCount++;
-            }
-        }
-
-        await refreshUI();
-        
-        statusDiv.textContent = `✅ สแกนเสร็จ นำเข้า ${importedCount} วิชา (ซ้ำ ${skippedCount})`;
-        statusDiv.className = 'db-status success';
-        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
-        
-        alert(`📂 สแกนรูปภาพสำเร็จ!\n\n✅ นำเข้าใหม่: ${importedCount} วิชา\n⏭️ มีอยู่แล้ว: ${skippedCount} วิชา`);
-        
-        if (importedCount > 0) {
-            const all = await dbOp.getAll();
-            const firstItem = all.find(d => (d.type || 'MF') === currentCategory);
-            if (firstItem) loadSubject(firstItem.id);
+    async function clearAllCourses() {
+        const all = await getAllCourses();
+        for (let c of all) {
+            await deleteCourseById(c.id);
         }
     }
 
-    // ===============================
-    // CORE FUNCTIONS
-    // ===============================
+    // ---------- UI หลัก ----------
     async function refreshUI() {
-        const all = await dbOp.getAll();
-        let mf = 0, ss = 0;
-        all.forEach(d => {
-            if (d.type === 'SS') ss++;
-            else mf++;
-        });
-        document.getElementById('countMF').innerText = mf;
-        document.getElementById('countSS').innerText = ss;
-        renderSidebar();
-    }
+        if (!db) return;
+        const courses = await getAllCourses();
+        const mfCourses = courses.filter(c => c.type === 'MF');
+        const ssCourses = courses.filter(c => c.type === 'SS');
+        document.getElementById('countMF').innerText = mfCourses.length;
+        document.getElementById('countSS').innerText = ssCourses.length;
+        document.getElementById('dbStatus').innerText = `💾 IndexedDB: ${courses.length} รายการ`;
 
-    async function renderSidebar() {
-        const list = document.getElementById('subjectList');
-        list.innerHTML = "";
-        const all = await dbOp.getAll();
-        const filtered = all.filter(d => (d.type || 'MF') === currentCategory);
-        
+        const filtered = courses.filter(c => c.type === currentFilter);
+        const container = document.getElementById('subjectList');
         if (filtered.length === 0) {
-            list.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;">ยังไม่มีวิชา<br><small>คลิก "สแกนรูปภาพ" หรือ "เพิ่มวิชาใหม่"</small></div>';
-            return;
-        }
-        
-        filtered.forEach(data => {
-            const div = document.createElement('div');
-            div.className = `subject-item ${data.id === currentActiveId ? 'active' : ''}`;
-            div.innerHTML = `
-                <span style="flex:1" onclick="loadSubject('${data.id}')">${data.name}</span>
-                <div class="item-tools">
-                    <button style="color:white;background:none;border:none;cursor:pointer;" onclick="deleteSub(event, '${data.id}')">🗑️</button>
+            container.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;">❓ ไม่มีข้อมูลในหมวดนี้<br><small>กด "สแกนรูปภาพ" หรือ "เพิ่มวิชาใหม่"</small></div>';
+        } else {
+            container.innerHTML = filtered.map(c => `
+                <div class="subject-item ${currentCourseId === c.id ? 'active' : ''}" onclick="selectCourse('${c.id}')">
+                    <span>📘 ${c.name}</span>
+                    <button class="btn-danger-sm" onclick="event.stopPropagation(); deleteCourse('${c.id}')">🗑️</button>
                 </div>
-            `;
-            list.appendChild(div);
-        });
+            `).join('');
+        }
     }
 
-    function setCategory(cat) {
-        currentCategory = cat;
-        document.getElementById('kpiMF').classList.toggle('active', cat === 'MF');
-        document.getElementById('kpiSS').classList.toggle('active', cat === 'SS');
+    async function selectCourse(id) {
+        if (!db) return;
+        const courses = await getAllCourses();
+        const course = courses.find(c => c.id === id);
+        if (!course) return;
+        currentCourseId = id;
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('coursePanel').style.display = 'block';
+        document.getElementById('displayArea').style.display = 'block';
+        document.getElementById('editArea').style.display = 'none';
+        document.getElementById('courseName').innerText = course.name;
+        document.getElementById('courseType').innerText = course.type === 'MF' ? 'หลักสูตร จันทร์ - ศุกร์' : 'หลักสูตร เสาร์ - อาทิตย์';
+        const imgEl = document.getElementById('courseImage');
+        imgEl.src = course.imageUrl || '';
+        imgEl.alt = course.name;
+        await refreshUI();
+    }
+
+    function filterCategory(type) {
+        currentFilter = type;
+        document.getElementById('kpiMF').classList.toggle('active', type === 'MF');
+        document.getElementById('kpiSS').classList.toggle('active', type === 'SS');
         refreshUI();
     }
 
-    async function loadSubject(id) {
-        currentActiveId = id;
-        const data = await dbOp.get(id);
-        if (!data) return;
-        
-        document.getElementById('welcome').style.display = 'none';
-        document.getElementById('contentCard').style.display = 'block';
-        
-        // ตรวจสอบและซ่อน editorArea ถ้ามี
-        const editorArea = document.getElementById('editorArea');
-        if (editorArea) editorArea.style.display = 'none';
-        
-        document.getElementById('viewTitle').innerText = data.name || "";
-        document.getElementById('viewCourseType').innerText = data.type === 'SS' ? 'หลักสูตร เสาร์-อาทิตย์' : 'หลักสูตร จันทร์-ศุกร์';
-        const mainImage = document.getElementById('courseMainImage');
-        if (mainImage) mainImage.src = data.imageUrl || "";
-        
-        renderSidebar();
+    async function createNewCourse() {
+        let name = prompt("ชื่อวิชา:", "วิชาใหม่");
+        if (!name) return;
+        const newId = 'course_' + Date.now();
+        const newCourse = {
+            id: newId,
+            name: name,
+            type: currentFilter,
+            imageUrl: '',
+            createdAt: new Date().toISOString()
+        };
+        await saveCourse(newCourse);
+        await refreshUI();
+        await selectCourse(newId);
     }
 
-    async function addNewSubject() {
-        const name = prompt("ชื่อวิชาใหม่:");
-        if (name && name.trim()) {
-            const newId = 'subject_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            await dbOp.save({
-                id: newId,
-                name: name.trim(),
-                type: currentCategory,
-                imageUrl: "",
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            });
-            await refreshUI();
-            loadSubject(newId);
+    async function deleteCourse(id) {
+        if (!confirm("ลบรายวิชานี้ใช่ไหม?")) return;
+        await deleteCourseById(id);
+        if (currentCourseId === id) {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('coursePanel').style.display = 'none';
+            currentCourseId = null;
         }
+        await refreshUI();
     }
 
-    async function deleteSub(e, id) {
-        e.stopPropagation();
-        if (confirm("ยืนยันลบวิชานี้?")) {
-            await dbOp.delete(id);
-            if (currentActiveId === id) {
-                document.getElementById('welcome').style.display = 'block';
-                document.getElementById('contentCard').style.display = 'none';
-                currentActiveId = "";
-            }
-            await refreshUI();
-        }
-    }
-
+    // ---------- แก้ไขรูปแบบ (ชื่อ + รูป) ----------
     function enableEditMode() {
-        const editorArea = document.getElementById('editorArea');
-        if (editorArea) editorArea.style.display = 'block';
-        document.getElementById('editSubjectName').value = document.getElementById('viewTitle').innerText;
+        if (!currentCourseId) return;
+        document.getElementById('displayArea').style.display = 'none';
+        document.getElementById('editArea').style.display = 'block';
+        const nameField = document.getElementById('editName');
+        nameField.value = document.getElementById('courseName').innerText;
+        document.getElementById('editImageUpload').value = '';
     }
 
-    async function saveEditedSubject() {
-        const newName = document.getElementById('editSubjectName').value;
-        const file = document.getElementById('editImageFile').files[0];
-        const data = await dbOp.get(currentActiveId);
-        
-        if (data) {
-            data.name = newName || data.name;
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    data.imageUrl = e.target.result;
-                    data.updatedAt = new Date().toISOString();
-                    await dbOp.save(data);
-                    await refreshUI();
-                    await loadSubject(currentActiveId);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                data.updatedAt = new Date().toISOString();
-                await dbOp.save(data);
-                await loadSubject(currentActiveId);
-            }
+    async function saveEdit() {
+        if (!currentCourseId) return;
+        const courses = await getAllCourses();
+        const course = courses.find(c => c.id === currentCourseId);
+        if (!course) return;
+        course.name = document.getElementById('editName').value;
+        const file = document.getElementById('editImageUpload').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                course.imageUrl = e.target.result;
+                await saveCourse(course);
+                await selectCourse(currentCourseId);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            await saveCourse(course);
+            await selectCourse(currentCourseId);
         }
         cancelEdit();
     }
 
     function cancelEdit() {
-        const editorArea = document.getElementById('editorArea');
-        if (editorArea) editorArea.style.display = 'none';
-        loadSubject(currentActiveId);
+        if (currentCourseId) selectCourse(currentCourseId);
+        else document.getElementById('editArea').style.display = 'none';
     }
 
-    function enterFullPresentation() {
-        document.documentElement.requestFullscreen().catch(() => {});
-        document.body.classList.add('present-mode');
-    }
-
-    function exitFullPresentation() {
-        if (document.fullscreenElement) document.exitFullscreen();
-        document.body.classList.remove('present-mode');
-    }
-
-    async function exportData() {
-        const all = await dbOp.getAll();
-        const exportObj = {
-            version: '3.0',
-            exportDate: new Date().toISOString(),
-            count: all.length,
-            data: all
-        };
-        const jsonString = JSON.stringify(exportObj, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `km_courses_backup_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-    }
-
-    function importTrigger() {
-        document.getElementById('fileInput').click();
-    }
-
-    async function processImport(input) {
-        if (!input.files[0]) return;
-        const file = input.files[0];
-        const text = await file.text();
-        const importData = JSON.parse(text);
-        
-        let count = 0;
-        if (importData.data && Array.isArray(importData.data)) {
-            for (let item of importData.data) {
-                if (item.id && item.name) {
-                    await dbOp.save(item);
-                    count++;
-                }
-            }
-        } else if (Array.isArray(importData)) {
-            for (let item of importData) {
-                if (item.id && item.name) {
-                    await dbOp.save(item);
-                    count++;
-                }
-            }
-        }
-        
-        await refreshUI();
-        alert(`✅ Import สำเร็จ! นำเข้า ${count} รายการ`);
-        input.value = '';
-    }
-
-    async function clearAllData() {
-        if (confirm("⚠️ คำเตือน! การล้างข้อมูลจะลบวิชาทั้งหมดในระบบ\n\nยืนยันที่จะล้างข้อมูลทั้งหมด?")) {
-            await dbOp.clearAll();
-            document.getElementById('welcome').style.display = 'block';
-            document.getElementById('contentCard').style.display = 'none';
-            currentActiveId = "";
-            await refreshUI();
-            alert("🗑️ ลบข้อมูลทั้งหมดเรียบร้อยแล้ว");
-        }
-    }
-
-    // ===============================
-    // INITIALIZE
-    // ===============================
-    window.onload = async () => {
-        await initDB();
-        await refreshUI();
-        setCategory('MF');
-        
-        const count = await dbOp.count();
+    // ---------- สแกนรูปจากโฟลเดอร์ courses-img ----------
+    async function scanCourses() {
         const statusDiv = document.getElementById('dbStatus');
-        statusDiv.style.display = 'block';
-        statusDiv.textContent = `IndexedDB: ${count} วิชา`;
-        statusDiv.className = 'db-status';
-        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
-        
-        if (count === 0) {
-            console.log("ไม่มีข้อมูล แนะนำให้กดปุ่ม 'สแกนรูปภาพจากโฟลเดอร์'");
+        statusDiv.innerText = "⏳ กำลังสแกนรูป...";
+        // 🔧 แก้ไขรายชื่อไฟล์ให้ตรงกับไฟล์จริงของคุณ (กรุณาใส่ให้ครบถ้วน)
+        const imageList = [
+            "basic-computer.jpg", "computer-repair.jpg", "graphic-design.jpg", "flower-arrangement-mf.jpg",
+            "scented-clay-flower.jpg", "haircut-men.jpg", "womens-sewing.jpg", "batik-tiedye.jpg",
+            "herbal-processing.jpg", "nail-art.jpg", "contemporary-craft.jpg", "beauty-women.jpg",
+            "beautician.jpg", "applied-astrology.jpg", "thai-snacks-desserts.jpg", "homemade-cafe.jpg",
+            "fancy-candle.jpg", "patchwork-quilting.jpg"
+        ];
+        const baseUrl = '/km-smart-hub/courses-img/';
+        let added = 0, skipped = 0;
+        const existing = await getAllCourses();
+        const existingIds = new Set(existing.map(c => c.id));
+        for (let fileName of imageList) {
+            let name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '').replace(/-/g, ' ');
+            let type = fileName.includes('-ss') ? 'SS' : 'MF';
+            let id = `img_${fileName.replace(/\./g, '_')}`;
+            if (!existingIds.has(id)) {
+                await saveCourse({
+                    id: id,
+                    name: name,
+                    type: type,
+                    imageUrl: baseUrl + fileName,
+                    createdAt: new Date().toISOString()
+                });
+                added++;
+            } else {
+                skipped++;
+            }
         }
+        await refreshUI();
+        statusDiv.innerText = `✅ สแกนเสร็จ: +${added} วิชา (มีแล้ว ${skipped})`;
+        setTimeout(() => refreshUI(), 1500);
+        if (added > 0) alert(`📸 สแกนสำเร็จ! เพิ่มวิชาใหม่ ${added} รายการ`);
+    }
+
+    // ---------- Import / Export ----------
+    async function exportAllData() {
+        const courses = await getAllCourses();
+        const dataStr = JSON.stringify(courses, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `km_backup_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async function handleImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const text = await file.text();
+        const imported = JSON.parse(text);
+        if (!Array.isArray(imported)) {
+            alert("ไฟล์ไม่ถูกต้อง");
+            return;
+        }
+        for (let item of imported) {
+            if (item.id && item.name) {
+                await saveCourse(item);
+            }
+        }
+        await refreshUI();
+        alert("นำเข้าข้อมูลสำเร็จ");
+        event.target.value = '';
+    }
+
+    async function clearDatabase() {
+        if (!confirm("⚠️ ลบข้อมูลทั้งหมดในระบบใช่ไหม? (ไม่สามารถกู้คืนได้)")) return;
+        await clearAllCourses();
+        await refreshUI();
+        document.getElementById('welcomeScreen').style.display = 'block';
+        document.getElementById('coursePanel').style.display = 'none';
+        currentCourseId = null;
+        alert("ล้างข้อมูลเรียบร้อย");
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            document.body.classList.add('fullscreen-mode');
+        } else {
+            document.exitFullscreen();
+            document.body.classList.remove('fullscreen-mode');
+        }
+    }
+
+    // ---------- เริ่มต้นระบบ ----------
+    window.onload = async () => {
+        await openDB();
+        await refreshUI();
+        filterCategory('MF');
     };
 </script>
 </body>
