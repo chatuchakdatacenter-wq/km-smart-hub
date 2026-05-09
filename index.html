@@ -1,288 +1,232 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>KM Smart Hub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KM Smart Hub | ศูนย์ฝึกอาชีพจตุจักร</title>
 <style>
-:root{
---bma:#005C46;
---bma2:#0b7a5d;
---bg:#eef4f1;
---card:#ffffff;
---text:#16352d;
---muted:#6c7f78;
---radius:24px;
+:root {
+  --bma:#005C46;
+  --bma2:#047857;
+  --bg:#eef5f1;
+  --card:#ffffff;
+  --text:#16352d;
+  --muted:#667a73;
+  --line:#dbe8e2;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-background:var(--bg);
-color:var(--text);
-padding:18px;
-}
-.container{
-max-width:760px;
-margin:auto;
-}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif}
+body{padding:16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(18px,env(safe-area-inset-bottom))}
+.app{max-width:980px;margin:0 auto}
 .hero{
-background:linear-gradient(135deg,var(--bma),var(--bma2));
-color:#fff;
-padding:24px;
-border-radius:32px;
-box-shadow:0 10px 30px rgba(0,0,0,.12);
-position:relative;
-overflow:hidden;
+  background:linear-gradient(135deg,var(--bma),var(--bma2) 62%,#10b981);
+  color:white;border-radius:28px;padding:20px;box-shadow:0 14px 35px rgba(0,92,70,.22);overflow:hidden;position:relative
 }
-.hero:after{
-content:"";
-position:absolute;
-width:240px;
-height:240px;
-background:rgba(255,255,255,.08);
-border-radius:50%;
-right:-60px;
-top:-60px;
+.hero:after{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:999px;background:rgba(255,255,255,.12)}
+.hero .eyebrow{font-size:13px;opacity:.92;font-weight:700;letter-spacing:.02em}
+.hero h1{font-size:34px;line-height:1.02;margin:9px 0 6px}
+.hero p{font-size:15px;line-height:1.45;margin:0;opacity:.94;max-width:620px}
+.tools{display:grid;gap:10px;margin:14px 0}
+input,select,button{font:inherit}
+.search,.filter{
+  width:100%;border:1px solid var(--line);background:white;border-radius:18px;padding:15px 16px;font-size:16px;
+  box-shadow:0 4px 14px rgba(0,0,0,.04);outline:none
 }
-.hero small{
-opacity:.9;
-font-size:14px;
-}
-.hero h1{
-margin:10px 0 8px;
-font-size:42px;
-line-height:1;
-}
-.hero p{
-margin:0;
-font-size:18px;
-line-height:1.5;
-opacity:.92;
-max-width:500px;
-}
-.search-box{
-margin-top:18px;
-display:flex;
-gap:12px;
-flex-direction:column;
-}
-.search-box input,.search-box select{
-width:100%;
-padding:18px 20px;
-border:none;
-border-radius:20px;
-font-size:18px;
-background:#fff;
-box-shadow:0 3px 10px rgba(0,0,0,.05);
-}
-.kpis{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-margin:18px 0;
-}
-.kpi{
-background:#fff;
-border-radius:24px;
-padding:18px 10px;
-text-align:center;
-box-shadow:0 3px 10px rgba(0,0,0,.05);
-}
-.kpi strong{
-display:block;
-font-size:42px;
-color:var(--bma);
-}
-.kpi span{
-font-size:15px;
-color:var(--muted);
-}
-.section-title{
-margin:22px 4px 14px;
-font-size:22px;
-font-weight:700;
-}
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-gap:16px;
-}
-.card{
-background:#fff;
-border-radius:24px;
-overflow:hidden;
-box-shadow:0 6px 20px rgba(0,0,0,.06);
-transition:.2s ease;
-cursor:pointer;
-}
-.card:hover{transform:translateY(-2px)}
-.card img{
-width:100%;
-aspect-ratio:1/1;
-object-fit:cover;
-display:block;
-}
-.card-body{
-padding:14px;
-}
-.card-body h3{
-margin:0 0 8px;
-font-size:17px;
-line-height:1.3;
-}
-.badge{
-display:inline-block;
-padding:6px 12px;
-border-radius:999px;
-font-size:13px;
-background:#e7f3ee;
-color:var(--bma);
-font-weight:600;
-}
-.admin-toggle{
-margin:28px 0 14px;
-background:#fff;
-padding:18px 22px;
-border-radius:24px;
-font-weight:700;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
-box-shadow:0 3px 10px rgba(0,0,0,.05);
-}
-.admin-panel{
-display:none;
-grid-template-columns:1fr 1fr;
-gap:12px;
-margin-bottom:30px;
-}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.kpi{background:white;border-radius:20px;padding:13px 8px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.04);border:1px solid rgba(0,92,70,.07)}
+.kpi strong{display:block;color:var(--bma);font-size:30px;line-height:1}
+.kpi span{display:block;margin-top:5px;color:var(--muted);font-size:13px}
+.section{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 12px}
+.section h2{font-size:21px;margin:0}
+.count-note{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.card{background:white;border-radius:22px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.07);border:1px solid rgba(0,92,70,.07);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.1)}
+.card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#dfeae5}
+.card-body{padding:12px}
+.card h3{font-size:16px;line-height:1.25;margin:0 0 8px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;background:#e6f4ee;color:var(--bma);padding:5px 10px;font-size:12px;font-weight:800}
+.admin-toggle{margin:24px 0 10px;background:white;border:1px solid rgba(0,92,70,.08);border-radius:20px;padding:15px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.04);cursor:pointer}
+.admin-panel{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .admin-panel.show{display:grid}
-.btn{
-border:none;
-padding:16px;
-border-radius:20px;
-font-size:16px;
-font-weight:700;
-cursor:pointer;
-}
-.primary{background:var(--bma);color:#fff}
-.secondary{background:#fff;color:var(--bma);border:2px solid var(--bma)}
-.lightbox{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.9);
-display:none;
-align-items:center;
-justify-content:center;
-padding:20px;
-z-index:999;
-}
+.btn{border:none;border-radius:16px;padding:13px 10px;font-weight:800;cursor:pointer}
+.primary{background:var(--bma);color:white}
+.secondary{background:white;color:var(--bma);border:1px solid var(--bma)}
+.full{grid-column:1/-1}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.91);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
 .lightbox.show{display:flex}
-.lightbox img{
-max-width:100%;
-max-height:90vh;
-border-radius:20px;
-}
-.close{
-position:absolute;
-right:20px;
-top:20px;
-font-size:42px;
-color:#fff;
-cursor:pointer;
-}
+.lightbox img{max-width:100%;max-height:88dvh;object-fit:contain;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.close{position:absolute;right:18px;top:max(18px,env(safe-area-inset-top));width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,.16);color:white;display:grid;place-items:center;font-size:34px;line-height:1;cursor:pointer}
+.empty{display:none;background:white;border-radius:20px;padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line)}
 @media(max-width:640px){
-.hero h1{font-size:34px}
-.hero p{font-size:16px}
-.kpis{gap:10px}
-.kpi strong{font-size:34px}
-.grid{grid-template-columns:repeat(2,1fr)}
+  body{padding:12px}
+  .hero{border-radius:24px;padding:17px}
+  .hero h1{font-size:29px}
+  .hero p{font-size:14px}
+  .kpi{padding:11px 6px}
+  .kpi strong{font-size:25px}
+  .kpi span{font-size:12px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .card{border-radius:19px}
+  .card-body{padding:10px}
+  .card h3{font-size:14px}
 }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="hero">
-<small>ศูนย์ฝึกอาชีพกรุงเทพมหานคร เขตจตุจักร</small>
-<h1>KM Smart Hub</h1>
-<p>คลังภาพและองค์ความรู้รายวิชา รองรับ iPhone, iPad และคอมพิวเตอร์</p>
+<main class="app">
+  <section class="hero">
+    <div class="eyebrow">ศูนย์ฝึกอาชีพกรุงเทพมหานคร เขตจตุจักร</div>
+    <h1>KM Smart Hub</h1>
+    <p>คลังภาพและองค์ความรู้รายวิชา ใช้งานได้ทั้ง iPhone, iPad และคอมพิวเตอร์</p>
+  </section>
+
+  <section class="tools">
+    <input id="search" class="search" type="search" placeholder="🔍 ค้นหารายวิชา เช่น นวดไทย / คอมพิวเตอร์ / เสริมสวย">
+    <select id="filter" class="filter" aria-label="กรองประเภท">
+      <option value="all">ทุกประเภท</option>
+      <option value="MF">จันทร์–ศุกร์</option>
+      <option value="SS">เสาร์–อาทิตย์</option>
+    </select>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><strong id="allCount">0</strong><span>รายการทั้งหมด</span></div>
+    <div class="kpi"><strong id="mfCount">0</strong><span>จันทร์–ศุกร์</span></div>
+    <div class="kpi"><strong id="ssCount">0</strong><span>เสาร์–อาทิตย์</span></div>
+  </section>
+
+  <section class="section">
+    <h2>📚 รายวิชา</h2>
+    <div class="count-note" id="shownCount"></div>
+  </section>
+
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty">ไม่พบรายวิชาที่ค้นหา</div>
+
+  <div class="admin-toggle" id="adminToggle">
+    <span>⚙️ จัดการข้อมูล</span><span id="arrow">＋</span>
+  </div>
+  <div class="admin-panel" id="adminPanel">
+    <button class="btn primary" id="exportBtn">Export JSON</button>
+    <label class="btn secondary" style="text-align:center">Import JSON<input id="importFile" type="file" accept="application/json" hidden></label>
+    <button class="btn secondary full" id="resetBtn">คืนค่าตั้งต้น</button>
+  </div>
+</main>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <div class="close" id="closeBtn">×</div>
+  <img id="lightboxImg" alt="">
 </div>
-<div class="search-box">
-<input type="text" id="search" placeholder="🔍 ค้นหารายวิชา เช่น นวดไทย / คอมพิวเตอร์ / เสริมสวย">
-<select id="filter">
-<option value="all">ทุกประเภท</option>
-<option value="MF">จันทร์–ศุกร์</option>
-<option value="SS">เสาร์–อาทิตย์</option>
-</select>
-</div>
-<div class="kpis">
-<div class="kpi"><strong id="allCount">34</strong><span>รายการทั้งหมด</span></div>
-<div class="kpi"><strong id="mfCount">18</strong><span>จันทร์–ศุกร์</span></div>
-<div class="kpi"><strong id="ssCount">16</strong><span>เสาร์–อาทิตย์</span></div>
-</div>
-<div class="section-title">📚 รายวิชา</div>
-<div class="grid" id="grid"></div>
-<div class="admin-toggle" onclick="toggleAdmin()">
-<span>⚙️ จัดการข้อมูล</span>
-<span id="arrow">＋</span>
-</div>
-<div class="admin-panel" id="adminPanel">
-<button class="btn primary">Export JSON</button>
-<button class="btn secondary">Import JSON</button>
-<button class="btn secondary" style="grid-column:1/-1">คืนค่าตั้งต้น</button>
-</div>
-</div>
-<div class="lightbox" id="lightbox">
-<div class="close" onclick="closeLightbox()">×</div>
-<img id="lightboxImg" src="">
-</div>
+
 <script>
-const courses=[
-{name:'นวดไทย',type:'MF',img:'https://placehold.co/600x600?text=Thai+Massage'},
-{name:'เสริมสวย',type:'SS',img:'https://placehold.co/600x600?text=Beauty'},
-{name:'คอมพิวเตอร์เบื้องต้น',type:'SS',img:'https://placehold.co/600x600?text=Computer'},
-{name:'ตัดผมชาย',type:'MF',img:'https://placehold.co/600x600?text=Barber'},
-{name:'ทำขนมไทย',type:'MF',img:'https://placehold.co/600x600?text=Dessert'},
-{name:'เพ้นท์เล็บ',type:'SS',img:'https://placehold.co/600x600?text=Nail+Art'}
-];
-const grid=document.getElementById('grid');
+const DEFAULT_COURSES = [{"name": "Business internet mf", "type": "MF", "img": "/km-smart-hub/courses-img/Business internet-mf.jpg"}, {"name": "Flower mf", "type": "MF", "img": "/km-smart-hub/courses-img/Flower-mf.jpg"}, {"name": "Flower ss", "type": "SS", "img": "/km-smart-hub/courses-img/Flower-ss.jpg"}, {"name": "Foot Massage mf", "type": "MF", "img": "/km-smart-hub/courses-img/Foot Massage-mf.jpg"}, {"name": "Foot Massage ss", "type": "SS", "img": "/km-smart-hub/courses-img/Foot Massage-ss.jpg"}, {"name": "Graphic Design mf", "type": "MF", "img": "/km-smart-hub/courses-img/Graphic Design-mf.jpg"}, {"name": "Makeup mf", "type": "MF", "img": "/km-smart-hub/courses-img/Makeup-mf.jpg"}, {"name": "Makeup ss", "type": "SS", "img": "/km-smart-hub/courses-img/Makeup-ss.jpg"}, {"name": "Mobile Repairing ss", "type": "SS", "img": "/km-smart-hub/courses-img/Mobile Repairing-ss.jpg"}, {"name": "Thai Massage mf", "type": "MF", "img": "/km-smart-hub/courses-img/Thai Massage-mf.jpg"}, {"name": "Thai Massage ss", "type": "SS", "img": "/km-smart-hub/courses-img/Thai Massage-ss.jpg"}, {"name": "applied astrology mf", "type": "MF", "img": "/km-smart-hub/courses-img/applied-astrology-mf.png"}, {"name": "applied astrology ss", "type": "SS", "img": "/km-smart-hub/courses-img/applied-astrology-ss.jpg"}, {"name": "barber mf", "type": "MF", "img": "/km-smart-hub/courses-img/barber-mf.jpg"}, {"name": "barber ss", "type": "SS", "img": "/km-smart-hub/courses-img/barber-ss.jpg"}, {"name": "basic computer ss", "type": "SS", "img": "/km-smart-hub/courses-img/basic-computer-ss.jpg"}, {"name": "batik tiedye mf", "type": "MF", "img": "/km-smart-hub/courses-img/batik-tiedye-mf.jpg"}, {"name": "beautician mf", "type": "MF", "img": "/km-smart-hub/courses-img/beautician-mf.jpg"}, {"name": "beautician ss", "type": "SS", "img": "/km-smart-hub/courses-img/beautician-ss.jpg"}, {"name": "computer repair ss", "type": "SS", "img": "/km-smart-hub/courses-img/computer-repair-ss.jpg"}, {"name": "contemporary craft mf", "type": "MF", "img": "/km-smart-hub/courses-img/contemporary-craft-mf.jpg"}, {"name": "fancy candle ss", "type": "SS", "img": "/km-smart-hub/courses-img/fancy-candle-ss.jpg"}, {"name": "herbal processing mf", "type": "MF", "img": "/km-smart-hub/courses-img/herbal-processing-mf.jpg"}, {"name": "homemade cafe mf", "type": "MF", "img": "/km-smart-hub/courses-img/homemade-cafe-mf.jpg"}, {"name": "homemade cafe ss", "type": "SS", "img": "/km-smart-hub/courses-img/homemade-cafe-ss.jpg"}, {"name": "nail art mf", "type": "MF", "img": "/km-smart-hub/courses-img/nail-art-mf.jpg"}, {"name": "nail art ss", "type": "SS", "img": "/km-smart-hub/courses-img/nail-art-ss.jpg"}, {"name": "patchwork quilting mf", "type": "MF", "img": "/km-smart-hub/courses-img/patchwork-quilting-mf.jpg"}, {"name": "scented clay flower mf", "type": "MF", "img": "/km-smart-hub/courses-img/scented-clay-flower-mf.jpg"}, {"name": "scented clay flower ss", "type": "SS", "img": "/km-smart-hub/courses-img/scented-clay-flower-ss.jpg"}, {"name": "thai snacks desserts mf", "type": "MF", "img": "/km-smart-hub/courses-img/thai-snacks-desserts-mf.jpg"}, {"name": "thai snacks desserts ss", "type": "SS", "img": "/km-smart-hub/courses-img/thai-snacks-desserts-ss.jpg"}, {"name": "womens sewing mf", "type": "MF", "img": "/km-smart-hub/courses-img/womens-sewing-mf.jpg"}, {"name": "womens sewing ss", "type": "SS", "img": "/km-smart-hub/courses-img/womens-sewing-ss.jpg"}];
+const KEY = "kmSmartHubCoursesV2";
+let courses = loadCourses();
+
+function loadCourses(){
+  try {
+    const saved = localStorage.getItem(KEY);
+    if(saved) {
+      const parsed = JSON.parse(saved);
+      if(Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch(e) {}
+  return DEFAULT_COURSES;
+}
+
+function saveCourses(){ localStorage.setItem(KEY, JSON.stringify(courses)); }
+
+function labelType(t){ return t === "MF" ? "จันทร์–ศุกร์" : "เสาร์–อาทิตย์"; }
+
 function render(){
-const q=document.getElementById('search').value.toLowerCase();
-const f=document.getElementById('filter').value;
-grid.innerHTML='';
-const filtered=courses.filter(c=>{
-const matchSearch=c.name.toLowerCase().includes(q);
-const matchType=f==='all'||c.type===f;
-return matchSearch&&matchType;
-});
-filtered.forEach(c=>{
-const card=document.createElement('div');
-card.className='card';
-card.innerHTML=`<img src="${c.img}" alt="${c.name}"><div class="card-body"><h3>${c.name}</h3><span class="badge">${c.type==='MF'?'จันทร์–ศุกร์':'เสาร์–อาทิตย์'}</span></div>`;
-card.onclick=()=>openLightbox(c.img);
-grid.appendChild(card);
-});
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const f = document.getElementById("filter").value;
+  const filtered = courses.filter(c => {
+    const name = (c.name || "").toLowerCase();
+    return (!q || name.includes(q)) && (f === "all" || c.type === f);
+  });
+  document.getElementById("allCount").textContent = courses.length;
+  document.getElementById("mfCount").textContent = courses.filter(c=>c.type==="MF").length;
+  document.getElementById("ssCount").textContent = courses.filter(c=>c.type==="SS").length;
+  document.getElementById("shownCount").textContent = `แสดง ${filtered.length} รายการ`;
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  filtered.forEach(c => {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${c.img}" alt="${c.name}" loading="lazy" onerror="this.style.opacity=.35;this.alt='ไม่พบรูปภาพ';">
+      <div class="card-body">
+        <h3>${c.name}</h3>
+        <span class="badge">${labelType(c.type)}</span>
+      </div>`;
+    card.addEventListener("click", () => openLightbox(c.img, c.name));
+    grid.appendChild(card);
+  });
+  document.getElementById("empty").style.display = filtered.length ? "none" : "block";
 }
-function toggleAdmin(){
-const panel=document.getElementById('adminPanel');
-const arrow=document.getElementById('arrow');
-panel.classList.toggle('show');
-arrow.textContent=panel.classList.contains('show')?'−':'＋';
+
+function openLightbox(src, name){
+  const box = document.getElementById("lightbox");
+  const img = document.getElementById("lightboxImg");
+  img.src = src;
+  img.alt = name || "";
+  box.classList.add("show");
+  document.body.style.overflow = "hidden";
 }
-function openLightbox(src){
-document.getElementById('lightbox').classList.add('show');
-document.getElementById('lightboxImg').src=src;
-}
+
 function closeLightbox(){
-document.getElementById('lightbox').classList.remove('show');
+  document.getElementById("lightbox").classList.remove("show");
+  document.getElementById("lightboxImg").src = "";
+  document.body.style.overflow = "";
 }
-document.getElementById('lightbox').addEventListener('click',e=>{
-if(e.target.id==='lightbox')closeLightbox();
+
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("filter").addEventListener("change", render);
+document.getElementById("adminToggle").addEventListener("click", () => {
+  const panel = document.getElementById("adminPanel");
+  panel.classList.toggle("show");
+  document.getElementById("arrow").textContent = panel.classList.contains("show") ? "−" : "＋";
 });
-document.getElementById('search').addEventListener('input',render);
-document.getElementById('filter').addEventListener('change',render);
+document.getElementById("lightbox").addEventListener("click", e => { if(e.target.id === "lightbox") closeLightbox(); });
+document.getElementById("closeBtn").addEventListener("click", closeLightbox);
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeLightbox(); });
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(courses, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "km_backup_" + new Date().toISOString().slice(0,10) + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById("importFile").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if(!Array.isArray(data)) throw new Error("รูปแบบไฟล์ไม่ถูกต้อง");
+    courses = data.map(x => ({name:x.name || "Untitled", type:x.type || "MF", img:x.img || x.imageUrl || ""}));
+    saveCourses();
+    render();
+    alert("นำเข้าข้อมูลสำเร็จ");
+  } catch(err) {
+    alert("นำเข้าไม่สำเร็จ: " + err.message);
+  }
+  e.target.value = "";
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if(confirm("ต้องการคืนค่าตั้งต้นใช่หรือไม่?")) {
+    courses = DEFAULT_COURSES;
+    saveCourses();
+    render();
+  }
+});
+
 render();
 </script>
 </body>
