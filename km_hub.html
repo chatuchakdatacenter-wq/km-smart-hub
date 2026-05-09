@@ -320,7 +320,6 @@
     let db;
     let currentCategory = 'MF';
     let currentActiveId = "";
-    let currentCourseType = 'MF';
 
     // ===============================
     // INDEXEDDB OPERATIONS
@@ -399,8 +398,7 @@
         statusDiv.textContent = '⏳ กำลังสแกนรูปภาพ...';
         statusDiv.className = 'db-status warning';
 
-        // ลิสต์ชื่อไฟล์รูปภาพทั้งหมดของคุณ (34 วิชา)
-        // 🔧 แก้ไขรายชื่อนี้ให้ตรงกับไฟล์จริงของคุณ!
+        // 🔧 แก้ไขรายชื่อนี้ให้ตรงกับไฟล์รูปภาพของคุณ!
         const imageFiles = [
             "basic-computer.jpg",
             "computer-repair.jpg",
@@ -420,7 +418,6 @@
             "homemade-cafe.jpg",
             "fancy-candle.jpg",
             "patchwork-quilting.jpg"
-            // 🔧 เพิ่มชื่อไฟล์ที่เหลืออีก 16 รูปตรงนี้!
         ];
 
         const basePath = '/km-smart-hub/courses-img/';
@@ -428,9 +425,7 @@
         let skippedCount = 0;
 
         for (let fileName of imageFiles) {
-            // ตั้งชื่อวิชาจากชื่อไฟล์ (เอานามสกุลออก, แทน - ด้วย space)
             let name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '').replace(/-/g, ' ');
-            // ตรวจสอบหมวดหมู่จากชื่อไฟล์
             let type = 'MF';
             if (fileName.includes('-ss')) type = 'SS';
             else if (fileName.includes('-mf')) type = 'MF';
@@ -521,14 +516,16 @@
         
         document.getElementById('welcome').style.display = 'none';
         document.getElementById('contentCard').style.display = 'block';
-        document.getElementById('editorArea').style.display = 'none';
-        document.getElementById('actionBar').style.display = 'flex';
+        
+        // ตรวจสอบและซ่อน editorArea ถ้ามี
+        const editorArea = document.getElementById('editorArea');
+        if (editorArea) editorArea.style.display = 'none';
         
         document.getElementById('viewTitle').innerText = data.name || "";
         document.getElementById('viewCourseType').innerText = data.type === 'SS' ? 'หลักสูตร เสาร์-อาทิตย์' : 'หลักสูตร จันทร์-ศุกร์';
-        document.getElementById('courseMainImage').src = data.imageUrl || "";
+        const mainImage = document.getElementById('courseMainImage');
+        if (mainImage) mainImage.src = data.imageUrl || "";
         
-        currentCourseType = data.type || 'MF';
         renderSidebar();
     }
 
@@ -563,8 +560,8 @@
     }
 
     function enableEditMode() {
-        document.getElementById('presentationArea').style.display = 'none';
-        document.getElementById('editorArea').style.display = 'block';
+        const editorArea = document.getElementById('editorArea');
+        if (editorArea) editorArea.style.display = 'block';
         document.getElementById('editSubjectName').value = document.getElementById('viewTitle').innerText;
     }
 
@@ -595,7 +592,8 @@
     }
 
     function cancelEdit() {
-        document.getElementById('editorArea').style.display = 'none';
+        const editorArea = document.getElementById('editorArea');
+        if (editorArea) editorArea.style.display = 'none';
         loadSubject(currentActiveId);
     }
 
