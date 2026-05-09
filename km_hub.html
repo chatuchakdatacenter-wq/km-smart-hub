@@ -4,361 +4,490 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <title>KM Smart Hub - iOS Ready</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="format-detection" content="telephone=no" />
+  <title>KM Smart Hub | ศูนย์ฝึกอาชีพจตุจักร</title>
   <style>
-    :root {
-      --bma:#005C46; --bma2:#047857; --sky:#38bdf8; --bg:#f0f4f8; --ink:#1e293b; --muted:#64748b;
-      --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+    :root{
+      --bma:#005C46; --bma2:#047857; --gold:#d6a642; --bg:#f5f7f6; --card:#ffffff;
+      --text:#18342d; --muted:#60756e; --line:#dbe7e3; --shadow:0 16px 34px rgba(0,92,70,.10);
+      --radius:22px;
     }
-    * { box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin:0; min-height:100%; font-family:'Sarabun',sans-serif; background:var(--bg); color:var(--ink); }
-    body { min-height:100dvh; display:flex; overflow:hidden; }
-    button, input { font:inherit; }
-    button { touch-action:manipulation; }
-    .sidebar { width:320px; background:#1e293b; color:#fff; display:flex; flex-direction:column; flex-shrink:0; z-index:10; }
-    .sidebar-header { padding:calc(18px + var(--safe-top)) 18px 16px; text-align:center; border-bottom:1px solid #334155; }
-    .sidebar-header h2 { font-family:'Kanit'; color:var(--sky); margin:0 0 4px; letter-spacing:.3px; }
-    .add-btn { background:linear-gradient(135deg,var(--bma),var(--bma2) 55%,#10b981); color:#fff; margin:14px; padding:12px; border-radius:40px; border:0; font-family:'Kanit'; font-weight:700; cursor:pointer; }
-    .kpi-box { padding:0 14px 12px; display:flex; gap:12px; }
-    .kpi-card { flex:1; background:#0f172a; border-radius:14px; padding:12px; text-align:center; cursor:pointer; border:2px solid transparent; }
-    .kpi-card.active { border-color:var(--sky); background:#26364f; }
-    .kpi-card h5 { margin:0 0 4px; font-size:.82rem; opacity:.92; }
-    .kpi-card .count { font-size:1.65rem; font-weight:700; }
-    .subject-list { flex:1; overflow:auto; -webkit-overflow-scrolling:touch; padding:10px 12px; }
-    .subject-item { background:#0f172a; padding:14px; margin-bottom:9px; border-radius:12px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .subject-item.active { background:#2563eb; }
-    .subject-item span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .btn-danger-sm { background:transparent; border:0; color:#fca5a5; cursor:pointer; font-size:1rem; padding:6px; }
-    .data-panel { padding:12px 14px calc(14px + var(--safe-bottom)); border-top:1px solid #334155; display:grid; gap:8px; }
-    .data-panel button { width:100%; padding:11px; border-radius:10px; border:0; font-family:'Kanit'; cursor:pointer; font-weight:700; color:#fff; }
-    .btn-scan { background:#10b981; } .btn-export { background:#2563eb; } .btn-import { background:#64748b; } .btn-clear { background:#ef4444; }
-    .main-content { flex:1; padding:26px; overflow:auto; -webkit-overflow-scrolling:touch; }
-    .card { background:#fff; border-radius:28px; padding:30px; box-shadow:0 15px 35px rgba(0,0,0,.06); max-width:1100px; margin:0 auto; }
-    .welcome-area { text-align:center; padding:60px 20px; color:#475569; }
-    .welcome-area h1 { font-family:'Kanit'; margin:0 0 12px; }
-    .action-bar { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
-    .btn-action { background:#f1f5f9; padding:10px 18px; border-radius:40px; border:0; font-family:'Kanit'; cursor:pointer; }
-    #courseName { font-family:'Kanit'; color:#1e293b; margin:0; font-size:clamp(1.35rem,4vw,2rem); }
-    #courseType { color:#64748b; margin:6px 0 20px; }
-    .course-view { text-align:center; }
-    .course-view img { width:auto; max-width:100%; max-height:calc(100dvh - 210px); border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,.1); border:1px solid #e2e8f0; object-fit:contain; }
-    #editArea input { width:100%; padding:12px; margin:10px 0; border-radius:12px; border:1px solid #cbd5e1; }
-    .db-badge { position:fixed; right:12px; bottom:calc(12px + var(--safe-bottom)); background:#1e293b; color:#fff; padding:7px 13px; border-radius:999px; font-size:.75rem; z-index:99; }
-    .fullscreen-mode .sidebar,.fullscreen-mode .db-badge { display:none!important; } .fullscreen-mode .main-content { padding:0; } .fullscreen-mode .card { border-radius:0; max-width:100%; min-height:100dvh; }
-    @media (max-width: 820px) {
-      body { display:block; overflow:auto; min-height:100dvh; }
-      .sidebar { width:100%; min-height:auto; max-height:none; }
-      .sidebar-header { position:sticky; top:0; background:#1e293b; z-index:5; }
-      .kpi-box { padding:10px 12px; }
-      .subject-list { max-height:42dvh; padding-bottom:4px; }
-      .data-panel { grid-template-columns:1fr 1fr; padding-bottom:12px; }
-      .data-panel .btn-scan, .data-panel .btn-clear { grid-column:1 / -1; }
-      .main-content { padding:14px 12px calc(72px + var(--safe-bottom)); overflow:visible; }
-      .card { border-radius:20px; padding:18px; }
-      .welcome-area { padding:28px 14px; }
-      .action-bar { justify-content:stretch; }
-      .btn-action { flex:1; min-height:44px; }
-      .course-view img { max-height:none; width:100%; }
-      .db-badge { left:12px; right:12px; text-align:center; }
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+    body{margin:0; min-height:100dvh; font-family:Sarabun, Tahoma, sans-serif; background:linear-gradient(180deg,#eef7f3,#f7faf9 42%,#fff); color:var(--text); padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    .app{max-width:1180px; margin:auto; padding:18px}
+    .hero{background:linear-gradient(135deg,var(--bma),var(--bma2)); color:#fff; border-radius:28px; padding:22px; box-shadow:var(--shadow); position:relative; overflow:hidden}
+    .hero:after{content:""; position:absolute; right:-70px; top:-70px; width:210px; height:210px; border-radius:50%; background:rgba(255,255,255,.12)}
+    .kicker{font-weight:700; opacity:.9; letter-spacing:.02em}
+    h1{margin:8px 0 6px; font-size:clamp(26px,5vw,42px); line-height:1.15}
+    .subtitle{margin:0; color:rgba(255,255,255,.88); font-size:16px}
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0}
+    .stat{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:14px; box-shadow:0 8px 20px rgba(0,0,0,.04)}
+    .stat strong{display:block; font-size:28px; color:var(--bma); line-height:1}
+    .stat span{font-size:13px; color:var(--muted)}
+    .toolbar{position:sticky; top:0; z-index:10; margin:14px 0; background:rgba(245,247,246,.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); padding:12px 0}
+    .controls{display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center}
+    input,select,button{font:inherit; min-height:46px; border-radius:16px; border:1px solid var(--line); background:#fff; color:var(--text); padding:0 14px}
+    input{width:100%}
+    button{cursor:pointer; font-weight:700; background:var(--bma); color:#fff; border-color:var(--bma)}
+    button.secondary{background:#fff; color:var(--bma)}
+    .note{margin:6px 2px 0; font-size:13px; color:var(--muted)}
+    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:8px 0 30px}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.05)}
+    .thumb{position:relative; aspect-ratio:4/3; background:#e8f1ee; overflow:hidden}
+    .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+    .badge{position:absolute; left:12px; top:12px; padding:7px 10px; border-radius:999px; font-weight:700; font-size:13px; color:#fff; background:rgba(0,92,70,.92)}
+    .badge.ss{background:rgba(214,166,66,.94); color:#2b2108}
+    .content{padding:14px}
+    .title{margin:0 0 6px; font-size:19px; font-weight:800}
+    .meta{margin:0; color:var(--muted); font-size:14px}
+    .empty{text-align:center; padding:40px 12px; color:var(--muted); background:#fff; border:1px dashed var(--line); border-radius:22px; grid-column:1/-1}
+    .admin{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    #fileInput{display:none}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){
+      .app{padding:12px} .hero{border-radius:22px; padding:18px} .stats{grid-template-columns:repeat(3,1fr); gap:8px}
+      .stat{padding:12px 8px; text-align:center} .stat strong{font-size:24px} .stat span{font-size:12px}
+      .controls{grid-template-columns:1fr; gap:8px} .grid{grid-template-columns:1fr; gap:12px}
+      button,select,input{width:100%; min-height:48px} .admin{display:grid; grid-template-columns:1fr 1fr; gap:8px}
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="sidebar-header"><h2>KM SMART HUB</h2><div style="font-size:.78rem;color:#94a3b8">ระบบจัดการองค์ความรู้</div></div>
-    <button class="add-btn" onclick="createNewCourse()">+ เพิ่มวิชาใหม่</button>
-    <div class="kpi-box">
-      <div class="kpi-card active" id="kpiMF" onclick="filterCategory('MF')"><h5>จันทร์-ศุกร์</h5><div class="count" id="countMF">0</div></div>
-      <div class="kpi-card" id="kpiSS" onclick="filterCategory('SS')"><h5>เสาร์-อาทิตย์</h5><div class="count" id="countSS">0</div></div>
-    </div>
-    <div class="subject-list" id="subjectList"><div style="color:#94a3b8;text-align:center;padding:20px">กำลังโหลดข้อมูล...</div></div>
-    <div class="data-panel">
-      <button class="btn-scan" onclick="seedDefaultCourses(true)">โหลดข้อมูลตั้งต้น</button>
-      <button class="btn-export" onclick="exportAllData()">Export JSON</button>
-      <button class="btn-import" onclick="document.getElementById('importFile').click()">Import JSON</button>
-      <button class="btn-clear" onclick="clearDatabase()">ล้างข้อมูลทั้งหมด</button>
-      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="handleImport(event)">
-    </div>
-  </div>
-  <main class="main-content">
-    <section id="welcomeScreen" class="card welcome-area">
-      <h1>ยินดีต้อนรับ</h1>
-      <p>ระบบพร้อมใช้งานบนมือถือ iOS / Android / Desktop</p>
-      <p style="margin-top:14px;font-size:.92rem">ข้อมูลรายวิชาจะโหลดจากชุดข้อมูลตั้งต้น และสามารถ Import/Export JSON ได้</p>
+  <main class="app">
+    <section class="hero">
+      <div class="kicker">ศูนย์ฝึกอาชีพกรุงเทพมหานคร เขตจตุจักร</div>
+      <h1>KM Smart Hub</h1>
+      <p class="subtitle">คลังภาพและองค์ความรู้รายวิชา ใช้งานง่ายบนคอมพิวเตอร์ iPhone และ iPad</p>
     </section>
-    <section id="coursePanel" class="card" style="display:none">
-      <div class="action-bar"><button class="btn-action" onclick="toggleFullscreen()">เปิดแบบเต็มจอ</button><button class="btn-action" onclick="enableEditMode()">✏️ แก้ไขข้อมูล</button></div>
-      <div id="displayArea"><h2 id="courseName"></h2><p id="courseType"></p><div class="course-view"><img id="courseImage" alt=""></div></div>
-      <div id="editArea" style="display:none"><h3>✏️ แก้ไขรายวิชา</h3><input id="editName" placeholder="ชื่อวิชา"><input type="file" id="editImageUpload" accept="image/*"><div style="display:flex;gap:10px;margin-top:12px"><button class="btn-action" style="background:#10b981;color:white" onclick="saveEdit()">บันทึก</button><button class="btn-action" onclick="cancelEdit()">ยกเลิก</button></div></div>
+
+    <section class="stats" aria-label="สถิติข้อมูล">
+      <div class="stat"><strong id="totalCount">0</strong><span>รายการทั้งหมด</span></div>
+      <div class="stat"><strong id="mfCount">0</strong><span>จันทร์–ศุกร์</span></div>
+      <div class="stat"><strong id="ssCount">0</strong><span>เสาร์–อาทิตย์</span></div>
     </section>
+
+    <section class="toolbar">
+      <div class="controls">
+        <input id="search" type="search" placeholder="ค้นหาวิชา เช่น นวดไทย / คอมพิวเตอร์ / เสริมสวย" autocomplete="off" />
+        <select id="typeFilter" aria-label="กรองประเภทวันเรียน">
+          <option value="ALL">ทุกประเภท</option>
+          <option value="MF">จันทร์–ศุกร์</option>
+          <option value="SS">เสาร์–อาทิตย์</option>
+        </select>
+        <button class="secondary" id="resetBtn" type="button">ล้างตัวกรอง</button>
+      </div>
+      <p class="note">ออกแบบใหม่ให้เหลือเฉพาะฐานข้อมูลที่มีจริง: รูปภาพรายวิชา + ประเภทวันเรียน + การค้นหา/กรอง</p>
+      <div class="admin">
+        <button id="exportBtn" type="button">Export JSON</button>
+        <button id="importBtn" type="button" class="secondary">Import JSON</button>
+        <button id="restoreBtn" type="button" class="secondary">คืนค่าตั้งต้น</button>
+        <input id="fileInput" type="file" accept="application/json,.json" />
+      </div>
+    </section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
   </main>
-  <div class="db-badge" id="dbStatus">IndexedDB: กำลังเชื่อมต่อ</div>
+
 <script>
-const DEFAULT_COURSES = [
+const DEFAULT_ITEMS = [
   {
     "id": "img_Business internet-mf_jpg",
     "name": "Business internet mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Business internet-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.252Z"
+    "createdAt": "2026-05-09T11:14:44.252Z",
+    "titleTh": "ธุรกิจอินเทอร์เน็ต",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ธุรกิจอินเทอร์เน็ต business internet mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Flower-mf_jpg",
     "name": "Flower mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Flower-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.255Z"
+    "createdAt": "2026-05-09T11:14:44.255Z",
+    "titleTh": "การจัดดอกไม้",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "การจัดดอกไม้ flower mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Flower-ss_jpg",
     "name": "Flower ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/Flower-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.256Z"
+    "createdAt": "2026-05-09T11:14:44.256Z",
+    "titleTh": "การจัดดอกไม้",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "การจัดดอกไม้ flower ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_Foot Massage-mf_jpg",
     "name": "Foot Massage mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Foot Massage-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.257Z"
+    "createdAt": "2026-05-09T11:14:44.257Z",
+    "titleTh": "นวดเท้า",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "นวดเท้า foot massage mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Foot Massage-ss_jpg",
     "name": "Foot Massage ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/Foot Massage-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.257Z"
+    "createdAt": "2026-05-09T11:14:44.257Z",
+    "titleTh": "นวดเท้า",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "นวดเท้า foot massage ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_Graphic Design-mf_jpg",
     "name": "Graphic Design mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Graphic Design-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.258Z"
+    "createdAt": "2026-05-09T11:14:44.258Z",
+    "titleTh": "กราฟิกดีไซน์",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "กราฟิกดีไซน์ graphic design mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Makeup-mf_jpg",
     "name": "Makeup mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Makeup-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.261Z"
+    "createdAt": "2026-05-09T11:14:44.261Z",
+    "titleTh": "แต่งหน้า",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "แต่งหน้า makeup mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Makeup-ss_jpg",
     "name": "Makeup ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/Makeup-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.261Z"
+    "createdAt": "2026-05-09T11:14:44.261Z",
+    "titleTh": "แต่งหน้า",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "แต่งหน้า makeup ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_Mobile Repairing-ss_jpg",
     "name": "Mobile Repairing ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/Mobile Repairing-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.262Z"
+    "createdAt": "2026-05-09T11:14:44.262Z",
+    "titleTh": "ซ่อมโทรศัพท์มือถือ",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ซ่อมโทรศัพท์มือถือ mobile repairing ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_Thai Massage-mf_jpg",
     "name": "Thai Massage mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/Thai Massage-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.265Z"
+    "createdAt": "2026-05-09T11:14:44.265Z",
+    "titleTh": "นวดแผนไทย",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "นวดแผนไทย thai massage mf จันทร์–ศุกร์"
   },
   {
     "id": "img_Thai Massage-ss_jpg",
     "name": "Thai Massage ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/Thai Massage-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.266Z"
+    "createdAt": "2026-05-09T11:14:44.266Z",
+    "titleTh": "นวดแผนไทย",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "นวดแผนไทย thai massage ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_applied-astrology-mf_png",
     "name": "applied astrology mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/applied-astrology-mf.png",
-    "createdAt": "2026-05-09T11:14:44.242Z"
+    "createdAt": "2026-05-09T11:14:44.242Z",
+    "titleTh": "โหราศาสตร์ประยุกต์",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "โหราศาสตร์ประยุกต์ applied astrology mf จันทร์–ศุกร์"
   },
   {
     "id": "img_applied-astrology-ss_jpg",
     "name": "applied astrology ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/applied-astrology-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.245Z"
+    "createdAt": "2026-05-09T11:14:44.245Z",
+    "titleTh": "โหราศาสตร์ประยุกต์",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "โหราศาสตร์ประยุกต์ applied astrology ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_barber-mf_jpg",
     "name": "barber mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/barber-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.246Z"
+    "createdAt": "2026-05-09T11:14:44.246Z",
+    "titleTh": "ตัดผมชาย",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ตัดผมชาย barber mf จันทร์–ศุกร์"
   },
   {
     "id": "img_barber-ss_jpg",
     "name": "barber ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/barber-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.247Z"
+    "createdAt": "2026-05-09T11:14:44.247Z",
+    "titleTh": "ตัดผมชาย",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ตัดผมชาย barber ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_basic-computer-ss_jpg",
     "name": "basic computer ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/basic-computer-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.248Z"
+    "createdAt": "2026-05-09T11:14:44.248Z",
+    "titleTh": "คอมพิวเตอร์เบื้องต้น",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "คอมพิวเตอร์เบื้องต้น basic computer ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_batik-tiedye-mf_jpg",
     "name": "batik tiedye mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/batik-tiedye-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.249Z"
+    "createdAt": "2026-05-09T11:14:44.249Z",
+    "titleTh": "บาติก/มัดย้อม",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "บาติก/มัดย้อม batik tiedye mf จันทร์–ศุกร์"
   },
   {
     "id": "img_beautician-mf_jpg",
     "name": "beautician mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/beautician-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.250Z"
+    "createdAt": "2026-05-09T11:14:44.250Z",
+    "titleTh": "เสริมสวย",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "เสริมสวย beautician mf จันทร์–ศุกร์"
   },
   {
     "id": "img_beautician-ss_jpg",
     "name": "beautician ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/beautician-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.251Z"
+    "createdAt": "2026-05-09T11:14:44.251Z",
+    "titleTh": "เสริมสวย",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "เสริมสวย beautician ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_computer-repair-ss_jpg",
     "name": "computer repair ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/computer-repair-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.253Z"
+    "createdAt": "2026-05-09T11:14:44.253Z",
+    "titleTh": "ซ่อมคอมพิวเตอร์",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ซ่อมคอมพิวเตอร์ computer repair ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_contemporary-craft-mf_jpg",
     "name": "contemporary craft mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/contemporary-craft-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.254Z"
+    "createdAt": "2026-05-09T11:14:44.254Z",
+    "titleTh": "งานประดิษฐ์ร่วมสมัย",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "งานประดิษฐ์ร่วมสมัย contemporary craft mf จันทร์–ศุกร์"
   },
   {
     "id": "img_fancy-candle-ss_jpg",
     "name": "fancy candle ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/fancy-candle-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.255Z"
+    "createdAt": "2026-05-09T11:14:44.255Z",
+    "titleTh": "เทียนแฟนซี",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "เทียนแฟนซี fancy candle ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_herbal-processing-mf_jpg",
     "name": "herbal processing mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/herbal-processing-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.259Z"
+    "createdAt": "2026-05-09T11:14:44.259Z",
+    "titleTh": "แปรรูปสมุนไพร",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "แปรรูปสมุนไพร herbal processing mf จันทร์–ศุกร์"
   },
   {
     "id": "img_homemade-cafe-mf_jpg",
     "name": "homemade cafe mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/homemade-cafe-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.259Z"
+    "createdAt": "2026-05-09T11:14:44.259Z",
+    "titleTh": "โฮมเมดคาเฟ่",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "โฮมเมดคาเฟ่ homemade cafe mf จันทร์–ศุกร์"
   },
   {
     "id": "img_homemade-cafe-ss_jpg",
     "name": "homemade cafe ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/homemade-cafe-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.260Z"
+    "createdAt": "2026-05-09T11:14:44.260Z",
+    "titleTh": "โฮมเมดคาเฟ่",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "โฮมเมดคาเฟ่ homemade cafe ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_nail-art-mf_jpg",
     "name": "nail art mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/nail-art-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.263Z"
+    "createdAt": "2026-05-09T11:14:44.263Z",
+    "titleTh": "ทำเล็บ",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ทำเล็บ nail art mf จันทร์–ศุกร์"
   },
   {
     "id": "img_nail-art-ss_jpg",
     "name": "nail art ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/nail-art-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.263Z"
+    "createdAt": "2026-05-09T11:14:44.263Z",
+    "titleTh": "ทำเล็บ",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ทำเล็บ nail art ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_patchwork-quilting-mf_jpg",
     "name": "patchwork quilting mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/patchwork-quilting-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.264Z"
+    "createdAt": "2026-05-09T11:14:44.264Z",
+    "titleTh": "แพตช์เวิร์ก/ควิลท์",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "แพตช์เวิร์ก/ควิลท์ patchwork quilting mf จันทร์–ศุกร์"
   },
   {
     "id": "img_scented-clay-flower-mf_jpg",
     "name": "scented clay flower mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/scented-clay-flower-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.264Z"
+    "createdAt": "2026-05-09T11:14:44.264Z",
+    "titleTh": "ดอกไม้ดินหอม",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ดอกไม้ดินหอม scented clay flower mf จันทร์–ศุกร์"
   },
   {
     "id": "img_scented-clay-flower-ss_jpg",
     "name": "scented clay flower ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/scented-clay-flower-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.265Z"
+    "createdAt": "2026-05-09T11:14:44.265Z",
+    "titleTh": "ดอกไม้ดินหอม",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ดอกไม้ดินหอม scented clay flower ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_thai-snacks-desserts-mf_jpg",
     "name": "thai snacks desserts mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/thai-snacks-desserts-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.267Z"
+    "createdAt": "2026-05-09T11:14:44.267Z",
+    "titleTh": "ขนมไทย/เบเกอรี่",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ขนมไทย/เบเกอรี่ thai snacks desserts mf จันทร์–ศุกร์"
   },
   {
     "id": "img_thai-snacks-desserts-ss_jpg",
     "name": "thai snacks desserts ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/thai-snacks-desserts-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.267Z"
+    "createdAt": "2026-05-09T11:14:44.267Z",
+    "titleTh": "ขนมไทย/เบเกอรี่",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ขนมไทย/เบเกอรี่ thai snacks desserts ss เสาร์–อาทิตย์"
   },
   {
     "id": "img_womens-sewing-mf_jpg",
     "name": "womens sewing mf",
     "type": "MF",
     "imageUrl": "/km-smart-hub/courses-img/womens-sewing-mf.jpg",
-    "createdAt": "2026-05-09T11:14:44.268Z"
+    "createdAt": "2026-05-09T11:14:44.268Z",
+    "titleTh": "ตัดเย็บเสื้อผ้าสตรี",
+    "scheduleTh": "จันทร์–ศุกร์",
+    "searchText": "ตัดเย็บเสื้อผ้าสตรี womens sewing mf จันทร์–ศุกร์"
   },
   {
     "id": "img_womens-sewing-ss_jpg",
     "name": "womens sewing ss",
     "type": "SS",
     "imageUrl": "/km-smart-hub/courses-img/womens-sewing-ss.jpg",
-    "createdAt": "2026-05-09T11:14:44.269Z"
+    "createdAt": "2026-05-09T11:14:44.269Z",
+    "titleTh": "ตัดเย็บเสื้อผ้าสตรี",
+    "scheduleTh": "เสาร์–อาทิตย์",
+    "searchText": "ตัดเย็บเสื้อผ้าสตรี womens sewing ss เสาร์–อาทิตย์"
   }
 ];
-const DB_NAME='KMSmartHub'; const STORE_NAME='courses'; let db=null; let currentFilter='MF'; let currentCourseId=null;
-function cleanName(fileName){ return fileName.replace(/\.(jpg|jpeg|png|gif|webp)$/i,'').replace(/-(mf|ss)$/i,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim(); }
-function normalizeCourse(c){ const file=(c.imageUrl||'').split('/').pop()||c.name||''; const type=c.type || (/[-_]ss\./i.test(file)?'SS':'MF'); return {...c,id:c.id||('img_'+file.replace(/\./g,'_')),name:c.name && !/\s(mf|ss)$/i.test(c.name)?c.name:cleanName(file),type,imageUrl:c.imageUrl||('/km-smart-hub/courses-img/'+file),createdAt:c.createdAt||new Date().toISOString()}; }
-function openDB(){return new Promise((resolve,reject)=>{ if(!('indexedDB' in window)) return reject(new Error('IndexedDB not supported')); const r=indexedDB.open(DB_NAME,2); r.onerror=()=>reject(r.error); r.onsuccess=()=>{db=r.result; resolve(db)}; r.onupgradeneeded=e=>{const d=e.target.result; if(!d.objectStoreNames.contains(STORE_NAME)) d.createObjectStore(STORE_NAME,{keyPath:'id'});}; });}
-function txStore(mode='readonly'){ return db.transaction(STORE_NAME,mode).objectStore(STORE_NAME); }
-async function getAllCourses(){return new Promise((res,rej)=>{const req=txStore().getAll(); req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);});}
-async function saveCourse(course){return new Promise((res,rej)=>{const req=txStore('readwrite').put(normalizeCourse(course)); req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);});}
-async function deleteCourseById(id){return new Promise((res,rej)=>{const req=txStore('readwrite').delete(id); req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);});}
-async function clearAllCourses(){const all=await getAllCourses(); for(const c of all) await deleteCourseById(c.id);}
-async function seedDefaultCourses(showAlert=false){let added=0,updated=0; const existing=new Set((await getAllCourses()).map(c=>c.id)); for(const raw of DEFAULT_COURSES){ const c=normalizeCourse(raw); await saveCourse(c); existing.has(c.id)?updated++:added++; } await refreshUI(); if(showAlert) alert(`โหลดข้อมูลสำเร็จ: เพิ่ม ${added} / อัปเดต ${updated} รายการ`);}
-async function refreshUI(){ if(!db) return; const courses=(await getAllCourses()).map(normalizeCourse).sort((a,b)=>a.name.localeCompare(b.name,'th')); document.getElementById('countMF').textContent=courses.filter(c=>c.type==='MF').length; document.getElementById('countSS').textContent=courses.filter(c=>c.type==='SS').length; document.getElementById('dbStatus').textContent=`IndexedDB: ${courses.length} รายการ`; const filtered=courses.filter(c=>c.type===currentFilter); const box=document.getElementById('subjectList'); if(!filtered.length){box.innerHTML='<div style="color:#94a3b8;text-align:center;padding:20px">ไม่มีข้อมูลในหมวดนี้</div>';return} box.innerHTML=filtered.map(c=>`<div class="subject-item ${currentCourseId===c.id?'active':''}" onclick="selectCourse('${c.id.replace(/'/g,"\'")}')"><span>${c.name}</span><button class="btn-danger-sm" onclick="event.stopPropagation();deleteCourse('${c.id.replace(/'/g,"\'")}')">ลบ</button></div>`).join(''); }
-async function selectCourse(id){const courses=await getAllCourses(); const c=normalizeCourse(courses.find(x=>x.id===id)||{}); if(!c.id) return; currentCourseId=id; welcomeScreen.style.display='none'; coursePanel.style.display='block'; displayArea.style.display='block'; editArea.style.display='none'; courseName.textContent=c.name; courseType.textContent=c.type==='MF'?'หลักสูตร จันทร์-ศุกร์':'หลักสูตร เสาร์-อาทิตย์'; courseImage.src=c.imageUrl; courseImage.alt=c.name; await refreshUI(); if(matchMedia('(max-width: 820px)').matches) coursePanel.scrollIntoView({behavior:'smooth',block:'start'});}
-function filterCategory(type){currentFilter=type; kpiMF.classList.toggle('active',type==='MF'); kpiSS.classList.toggle('active',type==='SS'); refreshUI();}
-async function createNewCourse(){const name=prompt('ชื่อวิชา:','วิชาใหม่'); if(!name) return; const c={id:'course_'+Date.now(),name,type:currentFilter,imageUrl:'',createdAt:new Date().toISOString()}; await saveCourse(c); await refreshUI(); await selectCourse(c.id);}
-async function deleteCourse(id){if(!confirm('ลบรายวิชานี้ใช่ไหม?')) return; await deleteCourseById(id); if(currentCourseId===id){currentCourseId=null; welcomeScreen.style.display='block'; coursePanel.style.display='none';} await refreshUI();}
-function enableEditMode(){ if(!currentCourseId) return; displayArea.style.display='none'; editArea.style.display='block'; editName.value=courseName.textContent; editImageUpload.value=''; }
-async function saveEdit(){ if(!currentCourseId) return; const courses=await getAllCourses(); const c=courses.find(x=>x.id===currentCourseId); if(!c) return; c.name=editName.value.trim()||c.name; const file=editImageUpload.files[0]; if(file){ const reader=new FileReader(); reader.onload=async e=>{c.imageUrl=e.target.result; await saveCourse(c); await selectCourse(currentCourseId);}; reader.readAsDataURL(file); } else { await saveCourse(c); await selectCourse(currentCourseId); } }
-function cancelEdit(){ if(currentCourseId) selectCourse(currentCourseId); else editArea.style.display='none'; }
-async function exportAllData(){const data=JSON.stringify(await getAllCourses(),null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`km_backup_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);}
-async function handleImport(event){try{const file=event.target.files[0]; if(!file) return; const imported=JSON.parse(await file.text()); if(!Array.isArray(imported)) throw new Error('JSON ต้องเป็น Array'); for(const item of imported) if(item.id||item.name) await saveCourse(item); await refreshUI(); alert('นำเข้าข้อมูลสำเร็จ');}catch(e){alert('ไฟล์ไม่ถูกต้อง: '+e.message)}finally{event.target.value='';}}
-async function clearDatabase(){if(!confirm('⚠️ ลบข้อมูลทั้งหมดในระบบใช่ไหม?')) return; await clearAllCourses(); currentCourseId=null; welcomeScreen.style.display='block'; coursePanel.style.display='none'; await refreshUI();}
-function toggleFullscreen(){document.body.classList.toggle('fullscreen-mode'); const el=document.documentElement; if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{}); else if(document.exitFullscreen) document.exitFullscreen().catch(()=>{});}
-window.addEventListener('load',async()=>{try{await openDB(); if((await getAllCourses()).length===0) await seedDefaultCourses(false); await refreshUI(); filterCategory('MF');}catch(e){dbStatus.textContent='ไม่สามารถใช้ IndexedDB ได้'; alert('iOS อาจอยู่ใน Private Mode หรือบล็อกพื้นที่จัดเก็บ: '+e.message);}});
+const STORAGE_KEY = 'km-smart-hub-items-v2';
+const $ = (id) => document.getElementById(id);
+let items = loadItems();
+
+function loadItems() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return normalize(JSON.parse(saved));
+  } catch (e) { console.warn('Load local data failed', e); }
+  return normalize(DEFAULT_ITEMS);
+}
+function saveItems() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+function normalize(list) {
+  return (Array.isArray(list) ? list : []).filter(x => x && x.imageUrl).map((x, i) => {
+    const type = String(x.type || '').toUpperCase() === 'SS' ? 'SS' : 'MF';
+    const scheduleTh = type === 'SS' ? 'เสาร์–อาทิตย์' : 'จันทร์–ศุกร์';
+    const titleTh = x.titleTh || cleanTitle(x.name || x.id || `รายการที่ ${i+1}`);
+    return {...x, id:x.id || `item_${i}`, type, scheduleTh, titleTh, searchText:[titleTh, x.name, type, scheduleTh].join(' ').toLowerCase()};
+  });
+}
+function cleanTitle(name) {
+  return String(name).replace(/[-_]/g,' ').replace(/(mf|ss|jpg|png|jpeg|webp)/gi,'').replace(/\s+/g,' ').trim() || 'ไม่ระบุชื่อวิชา';
+}
+function render() {
+  const q = $('search').value.trim().toLowerCase();
+  const type = $('typeFilter').value;
+  const filtered = items.filter(item => (type === 'ALL' || item.type === type) && (!q || item.searchText.includes(q)));
+  $('totalCount').textContent = items.length;
+  $('mfCount').textContent = items.filter(x => x.type === 'MF').length;
+  $('ssCount').textContent = items.filter(x => x.type === 'SS').length;
+  $('grid').innerHTML = filtered.length ? filtered.map(cardHTML).join('') : '<div class="empty">ไม่พบรายการตามเงื่อนไขที่ค้นหา</div>';
+}
+function cardHTML(item) {
+  const safeTitle = escapeHTML(item.titleTh);
+  const safeMeta = escapeHTML(item.scheduleTh);
+  const safeUrl = escapeHTML(item.imageUrl);
+  const cls = item.type === 'SS' ? 'badge ss' : 'badge';
+  return `<article class="card"><div class="thumb"><img src="${safeUrl}" alt="${safeTitle}" loading="lazy" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(135deg,#dfeee9,#fff6dc)'"><span class="${cls}">${safeMeta}</span></div><div class="content"><h2 class="title">${safeTitle}</h2><p class="meta">ประเภท: ${safeMeta}</p></div></article>`;
+}
+function escapeHTML(s) { return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+$('search').addEventListener('input', render);
+$('typeFilter').addEventListener('change', render);
+$('resetBtn').addEventListener('click', () => { $('search').value=''; $('typeFilter').value='ALL'; render(); });
+$('restoreBtn').addEventListener('click', () => { if(confirm('ต้องการคืนค่าข้อมูลตั้งต้นใช่หรือไม่?')) { items = normalize(DEFAULT_ITEMS); saveItems(); render(); } });
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(items, null, 2)], {type:'application/json;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `km_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'_')}.json`; a.click(); URL.revokeObjectURL(a.href);
+});
+$('importBtn').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0]; if(!file) return;
+  try { items = normalize(JSON.parse(await file.text())); saveItems(); render(); alert('นำเข้าข้อมูลเรียบร้อย'); }
+  catch(err) { alert('ไฟล์ JSON ไม่ถูกต้อง'); console.error(err); }
+  e.target.value = '';
+});
+render();
 </script>
 </body>
 </html>
