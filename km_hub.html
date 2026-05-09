@@ -448,13 +448,42 @@
         const statusDiv = document.getElementById('dbStatus');
         statusDiv.innerText = "⏳ กำลังสแกนรูป...";
         // 🔧 แก้ไขรายชื่อไฟล์ให้ตรงกับไฟล์จริงของคุณ (กรุณาใส่ให้ครบถ้วน)
-        const imageList = [
-            "basic-computer.jpg", "computer-repair.jpg", "graphic-design.jpg", "flower-arrangement-mf.jpg",
-            "scented-clay-flower.jpg", "haircut-men.jpg", "womens-sewing.jpg", "batik-tiedye.jpg",
-            "herbal-processing.jpg", "nail-art.jpg", "contemporary-craft.jpg", "beauty-women.jpg",
-            "beautician.jpg", "applied-astrology.jpg", "thai-snacks-desserts.jpg", "homemade-cafe.jpg",
-            "fancy-candle.jpg", "patchwork-quilting.jpg"
-        ];
+const imageList = [
+    "applied-astrology-mf.png",
+    "applied-astrology-ss.jpg",
+    "barber-mf.jpg",
+    "barber-ss.jpg",
+    "basic-computer-ss.jpg",
+    "batik-tiedye-mf.jpg",
+    "beautician-mf.jpg",
+    "beautician-ss.jpg",
+    "Business internet-mf.jpg",
+    "computer-repair-ss.jpg",
+    "contemporary-craft-mf.jpg",
+    "fancy-candle-ss.jpg",
+    "Flower-mf.jpg",
+    "Flower-ss.jpg",
+    "Foot Massage-mf.jpg",
+    "Foot Massage-ss.jpg",
+    "Graphic Design-mf.jpg",
+    "herbal-processing-mf.jpg",
+    "homemade-cafe-mf.jpg",
+    "homemade-cafe-ss.jpg",
+    "Makeup-mf.jpg",
+    "Makeup-ss.jpg",
+    "Mobile Repairing-ss.jpg",
+    "nail-art-mf.jpg",
+    "nail-art-ss.jpg",
+    "patchwork-quilting-mf.jpg",
+    "scented-clay-flower-mf.jpg",
+    "scented-clay-flower-ss.jpg",
+    "Thai Massage-mf.jpg",
+    "Thai Massage-ss.jpg",
+    "thai-snacks-desserts-mf.jpg",
+    "thai-snacks-desserts-ss.jpg",
+    "womens-sewing-mf.jpg",
+    "womens-sewing-ss.jpg"
+];
         const baseUrl = '/km-smart-hub/courses-img/';
         let added = 0, skipped = 0;
         const existing = await getAllCourses();
