@@ -140,6 +140,15 @@
         .btn-data:hover {
             transform: translateY(-2px);
         }
+        
+        /* ปุ่มโหลด JSON สีเขียวเฉพาะ */
+        .btn-json-load {
+            background: #10b981;
+            color: white;
+        }
+        .btn-json-load:hover {
+            background: #059669;
+        }
 
         #quickNav { 
             display: none; 
@@ -784,6 +793,8 @@
     <div id="subjectList" class="subject-container"></div>
 
     <div class="data-management">
+        <!-- ปุ่มโหลดข้อมูลจาก JSON (เพิ่มใหม่) -->
+        <button class="btn-data btn-json-load" onclick="loadJSONToIndexedDB()">📥 โหลดข้อมูลจาก JSON</button>
         <button class="btn-data" style="background:var(--primary); color:white;" onclick="exportData()">📤 Export ข้อมูล</button>
         <button class="btn-data" style="background:var(--purple); color:white;" onclick="exportByCategory()">📂 Export แยกหมวดหมู่</button>
         <button class="btn-data" style="background:var(--secondary); color:white;" onclick="importTrigger()">📥 Import ข้อมูล</button>
@@ -828,7 +839,7 @@
                 <p id="viewCourseType" style="margin:0; font-size:0.75rem; font-weight:bold; color:var(--primary);"></p>
                 <h4 id="viewInstName" style="margin:5px 0; font-family:'Kanit';"></h4>
                 <span id="viewInstTitle" style="color:#64748b; font-size:0.9rem;"></span>
-                <p id="viewCourseType" style="margin:0; font-size:0.75rem; font-weight:bold; color:var(--primary);"></p>
+                <p id="viewCourseType2" style="margin:0; font-size:0.75rem; font-weight:bold; color:var(--primary);"></p>
             </div>
         </div>
 
@@ -970,6 +981,162 @@
     let currentActiveId = "";
     let currentCourseType = 'MF';
     let isInitialized = false;
+
+    // ===============================
+    // ฟังก์ชันโหลด JSON เข้า IndexedDB (เพิ่มใหม่)
+    // ===============================
+    async function loadJSONToIndexedDB() {
+        const statusEl = document.getElementById('dbStatus');
+        const jsonUrl = '/km-smart-hub/courses.json';
+        
+        try {
+            if (statusEl) {
+                statusEl.textContent = "⏳ กำลังโหลดข้อมูลจาก JSON...";
+                statusEl.className = "db-status warning";
+                statusEl.style.display = 'block';
+            }
+            
+            console.log("กำลังโหลด JSON จาก:", jsonUrl);
+            const response = await fetch(jsonUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status} - ไม่พบไฟล์ JSON ที่ ${jsonUrl}`);
+            }
+            
+            const courses = await response.json();
+            
+            if (!courses || !Array.isArray(courses) || courses.length === 0) {
+                throw new Error("รูปแบบ JSON ไม่ถูกต้อง หรือไม่มีข้อมูล");
+            }
+            
+            console.log(`โหลด JSON สำเร็จ พบ ${courses.length} รายวิชา`);
+            
+            // นำเข้าข้อมูลลง IndexedDB
+            let importedCount = 0;
+            let existingCount = 0;
+            
+            for (const course of courses) {
+                // ตรวจสอบว่ามีข้อมูลซ้ำหรือไม่ (ตรวจสอบจากชื่อวิชา)
+                const allData = await dbOp.getAll();
+                const exists = allData.some(item => item.name === course.name);
+                
+                if (!exists) {
+                    // สร้าง ID อัตโนมัติถ้าไม่มี
+                    const newId = course.id || `subject_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    
+                    const newSubject = {
+                        id: newId,
+                        name: course.name || "ไม่มีชื่อวิชา",
+                        type: course.type || 'MF',
+                        text: course.description || course.text || "",
+                        instName: course.instructor || course.instName || "",
+                        instTitle: course.instTitle || "",
+                        instImg: course.instImg || "",
+                        contentImg: course.image1 || course.contentImg || "",
+                        contentImg2: course.image2 || "",
+                        contentImg3: course.image3 || "",
+                        contentImg4: course.image4 || "",
+                        contentImg5: course.image5 || "",
+                        video: course.video || "",
+                        videoType: course.videoType || "video/mp4",
+                        caption1: course.caption1 || "",
+                        caption2: course.caption2 || "",
+                        caption3: course.caption3 || "",
+                        caption4: course.caption4 || "",
+                        caption5: course.caption5 || "",
+                        captionVideo: course.captionVideo || "",
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    await dbOp.save(newSubject);
+                    importedCount++;
+                    console.log(`นำเข้า: ${newSubject.name}`);
+                } else {
+                    existingCount++;
+                    console.log(`ข้าม (ซ้ำ): ${course.name}`);
+                }
+            }
+            
+            // รีเฟรช UI
+            await refreshUI();
+            
+            if (statusEl) {
+                statusEl.textContent = `✅ โหลด JSON สำเร็จ: +${importedCount} วิชา`;
+                statusEl.className = "db-status success";
+                setTimeout(async () => {
+                    const count = await dbOp.count();
+                    statusEl.textContent = `IndexedDB: ${count} items`;
+                    statusEl.className = "db-status";
+                }, 3000);
+            }
+            
+            alert(`📥 โหลดข้อมูลจาก JSON สำเร็จ!\n\n✅ นำเข้าใหม่: ${importedCount} รายการ\n⏭️ ข้าม (ชื่อซ้ำ): ${existingCount} รายการ\n\nสามารถดูรายวิชาได้ในเมนูด้านซ้าย`);
+            
+            // ถ้ามีการนำเข้าและไม่มีวิชาที่ถูกเลือกอยู่ ให้โหลดวิชาแรก
+            if (importedCount > 0) {
+                const all = await dbOp.getAll();
+                const filtered = all.filter(d => (d.type || 'MF') === currentCategory);
+                if (filtered.length > 0 && !currentActiveId) {
+                    await loadSubject(filtered[0].id);
+                }
+            }
+            
+        } catch (error) {
+            console.error("โหลด JSON ล้มเหลว:", error);
+            
+            if (statusEl) {
+                statusEl.textContent = `❌ โหลด JSON ล้มเหลว`;
+                statusEl.className = "db-status error";
+                setTimeout(() => {
+                    statusEl.textContent = `IndexedDB: ตรวจสอบไฟล์ JSON`;
+                    statusEl.className = "db-status";
+                }, 5000);
+            }
+            
+            let errorMessage = "❌ โหลดข้อมูลจาก JSON ไม่สำเร็จ\n\n";
+            if (error.message.includes("404")) {
+                errorMessage += "ไม่พบไฟล์ courses.json\n\n";
+                errorMessage += "👉 วิธีแก้ไข:\n";
+                errorMessage += "1. สร้างไฟล์ courses.json\n";
+                errorMessage += "2. อัปโหลดขึ้น GitHub ในโฟลเดอร์เดียวกับ km_hub.html\n";
+                errorMessage += "3. ตรวจสอบ URL: " + jsonUrl + "\n\n";
+                errorMessage += "หรือใช้ปุ่ม 'Import ข้อมูล' เพื่อเลือกไฟล์ JSON โดยตรง";
+            } else if (error.message.includes("Failed to fetch")) {
+                errorMessage += "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์\n\n";
+                errorMessage += "👉 ตรวจสอบว่า:\n";
+                errorMessage += "1. ไฟล์ courses.json อัปโหลดขึ้น GitHub แล้ว\n";
+                errorMessage += "2. ใช้ GitHub Pages หรือเซิร์ฟเวอร์ที่รองรับไฟล์ JSON";
+            } else {
+                errorMessage += `ข้อผิดพลาด: ${error.message}`;
+            }
+            
+            alert(errorMessage);
+        }
+    }
+
+    // ===============================
+    // ตรวจสอบและโหลดข้อมูลเริ่มต้น (เพิ่มใหม่)
+    // ===============================
+    async function checkAndLoadInitialData() {
+        try {
+            const count = await dbOp.count();
+            console.log(`จำนวนวิชาในระบบ: ${count}`);
+            
+            if (count === 0) {
+                console.log("ไม่พบข้อมูลในระบบ กำลังโหลดจาก JSON อัตโนมัติ...");
+                const statusEl = document.getElementById('dataStatus');
+                if (statusEl) {
+                    statusEl.textContent = "🔄 กำลังโหลดข้อมูลเริ่มต้น...";
+                }
+                await loadJSONToIndexedDB();
+            } else {
+                console.log("มีข้อมูลในระบบแล้ว ไม่ต้องโหลด JSON");
+            }
+        } catch (error) {
+            console.error("ตรวจสอบข้อมูลเริ่มต้นล้มเหลว:", error);
+        }
+    }
 
     // ===============================
     // INDEXEDDB OPERATIONS
@@ -1823,7 +1990,7 @@
             ${imported + merged > 0 ? '🎉 Import สำเร็จ!' : '⚠️ ไม่มีข้อมูลใหม่ที่นำเข้า'}
         `;
         
-        alert(summary); // ✅ แจ้งเตือนเมื่อ Import เสร็จ!
+        alert(summary);
         
         // อัพเดท UI
         refreshUI().then(() => {
@@ -1962,12 +2129,16 @@
             
             await refreshUI();
             
+            // ⭐ เพิ่ม: ตรวจสอบและโหลดข้อมูลเริ่มต้นจาก JSON อัตโนมัติ
+            await checkAndLoadInitialData();
+            
             window.onkeydown = (e) => { 
                 if (e.key === "Escape") exitFullPresentation(); 
             };
             
             document.getElementById('dbStatus').style.display = 'block';
-            document.getElementById('dbStatus').textContent = `IndexedDB: ${count} items`;
+            const finalCount = await dbOp.count();
+            document.getElementById('dbStatus').textContent = `IndexedDB: ${finalCount} items`;
             
             setInterval(async () => {
                 try {
@@ -2079,6 +2250,10 @@
             document.getElementById('viewInstName').innerText = data.instName || "ยังไม่ระบุชื่อ";
             document.getElementById('viewInstTitle').innerText = data.instTitle || "";
             document.getElementById('viewCourseType').innerText = data.type === 'SS' ? "หลักสูตร เสาร์-อาทิตย์" : "หลักสูตร จันทร์-ศุกร์";
+            const courseTypeEl = document.getElementById('viewCourseType2');
+            if (courseTypeEl) {
+                courseTypeEl.innerText = data.type === 'SS' ? "หลักสูตร เสาร์-อาทิตย์" : "หลักสูตร จันทร์-ศุกร์";
+            }
             document.getElementById('viewInstImg').src = data.instImg || "";
             document.getElementById('viewInstImg').style.display = data.instImg ? 'block' : 'none';
             

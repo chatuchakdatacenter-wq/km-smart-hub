@@ -1,0 +1,23 @@
+[
+  {
+    "name": "การพัฒนาเว็บแอปพลิเคชันด้วย JavaScript",
+    "type": "MF",
+    "description": "เรียนรู้การพัฒนาเว็บแอปพลิเคชันสมัยใหม่ด้วย JavaScript และ HTML5",
+    "instructor": "ดร. สมชาย ใจดี",
+    "instTitle": "ผู้เชี่ยวชาญด้านซอฟต์แวร์"
+  },
+  {
+    "name": "การจัดการฐานข้อมูลด้วย IndexedDB",
+    "type": "MF",
+    "description": "เรียนรู้การเก็บข้อมูลแบบ Offline-first ด้วย IndexedDB",
+    "instructor": "อ. วิศวกร ขยัน",
+    "instTitle": "นักพัฒนาเว็บอาวุโส"
+  },
+  {
+    "name": "บริหารจัดการโครงการด้วย Agile",
+    "type": "SS",
+    "description": "เรียนรู้กระบวนการทำงานแบบ Agile และ Scrum",
+    "instructor": "ดร. ธนา สุขุม",
+    "instTitle": "Certified Scrum Master"
+  }
+]
