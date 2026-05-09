@@ -1,574 +1,364 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>KM Smart Hub - ระบบจัดการองค์ความรู้</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Kanit:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background: #f0f4f8;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-        /* Sidebar */
-        .sidebar {
-            width: 320px;
-            background: #1e293b;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #334155;
-        }
-        .sidebar-header h2 {
-            font-family: 'Kanit';
-            color: #38bdf8;
-        }
-        .kpi-box {
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-        }
-        .kpi-card {
-            flex: 1;
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .kpi-card.active {
-            border-color: #38bdf8;
-            background: #1e293b;
-        }
-        .kpi-card h5 {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        .kpi-card .count {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-        .subject-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        .subject-item {
-            background: #0f172a;
-            padding: 14px;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            transition: 0.2s;
-        }
-        .subject-item.active {
-            background: #3b82f6;
-        }
-        .subject-item:hover {
-            background: #334155;
-        }
-        .btn-danger-sm {
-            background: none;
-            border: none;
-            color: #f87171;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        .data-panel {
-            padding: 15px;
-            border-top: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .data-panel button {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            font-family: 'Kanit';
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .data-panel button:hover {
-            transform: translateY(-2px);
-        }
-        .btn-scan { background: #10b981; color: white; }
-        .btn-export { background: #2563eb; color: white; }
-        .btn-import { background: #64748b; color: white; }
-        .btn-clear { background: #ef4444; color: white; }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-        }
-        .card {
-            background: white;
-            border-radius: 28px;
-            padding: 35px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .welcome-area {
-            text-align: center;
-            padding: 70px 20px;
-            color: #475569;
-        }
-        .course-view {
-            text-align: center;
-        }
-        .course-view img {
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-        }
-        .action-bar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        .btn-action {
-            background: #f1f5f9;
-            padding: 8px 20px;
-            border-radius: 40px;
-            border: none;
-            font-family: 'Kanit';
-            cursor: pointer;
-        }
-        .edit-form {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 20px;
-        }
-        .edit-form input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            margin-top: 10px;
-        }
-        .db-badge {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: #1e293b;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            z-index: 99;
-        }
-        .subject-title {
-            font-family: 'Kanit';
-            margin-bottom: 10px;
-        }
-        .fullscreen-mode .sidebar,
-        .fullscreen-mode .db-badge {
-            display: none !important;
-        }
-        .fullscreen-mode .main-content {
-            padding: 0;
-        }
-        .fullscreen-mode .card {
-            border-radius: 0;
-            padding: 30px;
-            max-width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>KM Smart Hub - iOS Ready</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bma:#005C46; --bma2:#047857; --sky:#38bdf8; --bg:#f0f4f8; --ink:#1e293b; --muted:#64748b;
+      --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin:0; min-height:100%; font-family:'Sarabun',sans-serif; background:var(--bg); color:var(--ink); }
+    body { min-height:100dvh; display:flex; overflow:hidden; }
+    button, input { font:inherit; }
+    button { touch-action:manipulation; }
+    .sidebar { width:320px; background:#1e293b; color:#fff; display:flex; flex-direction:column; flex-shrink:0; z-index:10; }
+    .sidebar-header { padding:calc(18px + var(--safe-top)) 18px 16px; text-align:center; border-bottom:1px solid #334155; }
+    .sidebar-header h2 { font-family:'Kanit'; color:var(--sky); margin:0 0 4px; letter-spacing:.3px; }
+    .add-btn { background:linear-gradient(135deg,var(--bma),var(--bma2) 55%,#10b981); color:#fff; margin:14px; padding:12px; border-radius:40px; border:0; font-family:'Kanit'; font-weight:700; cursor:pointer; }
+    .kpi-box { padding:0 14px 12px; display:flex; gap:12px; }
+    .kpi-card { flex:1; background:#0f172a; border-radius:14px; padding:12px; text-align:center; cursor:pointer; border:2px solid transparent; }
+    .kpi-card.active { border-color:var(--sky); background:#26364f; }
+    .kpi-card h5 { margin:0 0 4px; font-size:.82rem; opacity:.92; }
+    .kpi-card .count { font-size:1.65rem; font-weight:700; }
+    .subject-list { flex:1; overflow:auto; -webkit-overflow-scrolling:touch; padding:10px 12px; }
+    .subject-item { background:#0f172a; padding:14px; margin-bottom:9px; border-radius:12px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .subject-item.active { background:#2563eb; }
+    .subject-item span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .btn-danger-sm { background:transparent; border:0; color:#fca5a5; cursor:pointer; font-size:1rem; padding:6px; }
+    .data-panel { padding:12px 14px calc(14px + var(--safe-bottom)); border-top:1px solid #334155; display:grid; gap:8px; }
+    .data-panel button { width:100%; padding:11px; border-radius:10px; border:0; font-family:'Kanit'; cursor:pointer; font-weight:700; color:#fff; }
+    .btn-scan { background:#10b981; } .btn-export { background:#2563eb; } .btn-import { background:#64748b; } .btn-clear { background:#ef4444; }
+    .main-content { flex:1; padding:26px; overflow:auto; -webkit-overflow-scrolling:touch; }
+    .card { background:#fff; border-radius:28px; padding:30px; box-shadow:0 15px 35px rgba(0,0,0,.06); max-width:1100px; margin:0 auto; }
+    .welcome-area { text-align:center; padding:60px 20px; color:#475569; }
+    .welcome-area h1 { font-family:'Kanit'; margin:0 0 12px; }
+    .action-bar { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+    .btn-action { background:#f1f5f9; padding:10px 18px; border-radius:40px; border:0; font-family:'Kanit'; cursor:pointer; }
+    #courseName { font-family:'Kanit'; color:#1e293b; margin:0; font-size:clamp(1.35rem,4vw,2rem); }
+    #courseType { color:#64748b; margin:6px 0 20px; }
+    .course-view { text-align:center; }
+    .course-view img { width:auto; max-width:100%; max-height:calc(100dvh - 210px); border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,.1); border:1px solid #e2e8f0; object-fit:contain; }
+    #editArea input { width:100%; padding:12px; margin:10px 0; border-radius:12px; border:1px solid #cbd5e1; }
+    .db-badge { position:fixed; right:12px; bottom:calc(12px + var(--safe-bottom)); background:#1e293b; color:#fff; padding:7px 13px; border-radius:999px; font-size:.75rem; z-index:99; }
+    .fullscreen-mode .sidebar,.fullscreen-mode .db-badge { display:none!important; } .fullscreen-mode .main-content { padding:0; } .fullscreen-mode .card { border-radius:0; max-width:100%; min-height:100dvh; }
+    @media (max-width: 820px) {
+      body { display:block; overflow:auto; min-height:100dvh; }
+      .sidebar { width:100%; min-height:auto; max-height:none; }
+      .sidebar-header { position:sticky; top:0; background:#1e293b; z-index:5; }
+      .kpi-box { padding:10px 12px; }
+      .subject-list { max-height:42dvh; padding-bottom:4px; }
+      .data-panel { grid-template-columns:1fr 1fr; padding-bottom:12px; }
+      .data-panel .btn-scan, .data-panel .btn-clear { grid-column:1 / -1; }
+      .main-content { padding:14px 12px calc(72px + var(--safe-bottom)); overflow:visible; }
+      .card { border-radius:20px; padding:18px; }
+      .welcome-area { padding:28px 14px; }
+      .action-bar { justify-content:stretch; }
+      .btn-action { flex:1; min-height:44px; }
+      .course-view img { max-height:none; width:100%; }
+      .db-badge { left:12px; right:12px; text-align:center; }
+    }
+  </style>
 </head>
 <body>
-
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2>📚 KM SMART HUB</h2>
-        <div style="font-size:0.7rem; color:#94a3b8;">ระบบจัดการองค์ความรู้</div>
-    </div>
-    <button style="background:#10b981; color:white; margin:15px; padding:12px; border-radius:40px; border:none; font-family:'Kanit'; font-weight:bold; cursor:pointer;" onclick="createNewCourse()">+ เพิ่มวิชาใหม่</button>
-    
+  <div class="sidebar">
+    <div class="sidebar-header"><h2>KM SMART HUB</h2><div style="font-size:.78rem;color:#94a3b8">ระบบจัดการองค์ความรู้</div></div>
+    <button class="add-btn" onclick="createNewCourse()">+ เพิ่มวิชาใหม่</button>
     <div class="kpi-box">
-        <div class="kpi-card" id="kpiMF" onclick="filterCategory('MF')">
-            <h5>📅 จันทร์-ศุกร์</h5>
-            <div class="count" id="countMF">0</div>
-        </div>
-        <div class="kpi-card" id="kpiSS" onclick="filterCategory('SS')">
-            <h5>🌙 เสาร์-อาทิตย์</h5>
-            <div class="count" id="countSS">0</div>
-        </div>
+      <div class="kpi-card active" id="kpiMF" onclick="filterCategory('MF')"><h5>จันทร์-ศุกร์</h5><div class="count" id="countMF">0</div></div>
+      <div class="kpi-card" id="kpiSS" onclick="filterCategory('SS')"><h5>เสาร์-อาทิตย์</h5><div class="count" id="countSS">0</div></div>
     </div>
-
-    <div class="subject-list" id="subjectList">
-        <div style="color:#94a3b8; text-align:center; padding:20px;">✨ กด "สแกนรูปภาพ" เพื่อเริ่มต้น</div>
-    </div>
-
+    <div class="subject-list" id="subjectList"><div style="color:#94a3b8;text-align:center;padding:20px">กำลังโหลดข้อมูล...</div></div>
     <div class="data-panel">
-        <button class="btn-scan" onclick="scanCourses()">📂 สแกนรูปภาพจากโฟลเดอร์</button>
-        <button class="btn-export" onclick="exportAllData()">📤 Export ข้อมูล (.json)</button>
-        <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Import ข้อมูล (.json)</button>
-        <button class="btn-clear" onclick="clearDatabase()">🗑️ ล้างข้อมูลทั้งหมด</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+      <button class="btn-scan" onclick="seedDefaultCourses(true)">โหลดข้อมูลตั้งต้น</button>
+      <button class="btn-export" onclick="exportAllData()">Export JSON</button>
+      <button class="btn-import" onclick="document.getElementById('importFile').click()">Import JSON</button>
+      <button class="btn-clear" onclick="clearDatabase()">ล้างข้อมูลทั้งหมด</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="handleImport(event)">
     </div>
-</div>
-
-<div class="main-content">
-    <div id="welcomeScreen" class="card welcome-area">
-        <h1>📸 ยินดีต้อนรับ</h1>
-        <p>กรุณากดปุ่ม <strong>"📂 สแกนรูปภาพจากโฟลเดอร์"</strong> ด้านล่างซ้าย เพื่อโหลดรายวิชาทั้งหมด</p>
-        <p style="margin-top:20px; font-size:0.9rem;">⭐ ระบบจะทำการสร้างรายการวิชาจากไฟล์รูปภาพในโฟลเดอร์ courses-img โดยอัตโนมัติ</p>
-    </div>
-
-    <div id="coursePanel" class="card" style="display: none;">
-        <div class="action-bar">
-            <button class="btn-action" onclick="toggleFullscreen()">🖥️ เปิดแบบเต็มจอ</button>
-            <button class="btn-action" onclick="enableEditMode()">✏️ แก้ไขข้อมูล</button>
-        </div>
-        <div id="displayArea">
-            <h2 id="courseName" style="font-family:'Kanit'; color:#1e293b;"></h2>
-            <p id="courseType" style="color:#64748b; margin-bottom: 20px;"></p>
-            <div class="course-view">
-                <img id="courseImage" style="max-width:100%; border-radius:20px;">
-            </div>
-        </div>
-        <div id="editArea" style="display: none;">
-            <h3>✏️ แก้ไขรายวิชา</h3>
-            <input type="text" id="editName" placeholder="ชื่อวิชา" style="width:100%; padding:12px; margin:10px 0; border-radius:12px; border:1px solid #ccc;">
-            <input type="file" id="editImageUpload" accept="image/*">
-            <div style="display: flex; gap:10px; margin-top:15px;">
-                <button class="btn-action" style="background:#10b981; color:white;" onclick="saveEdit()">💾 บันทึก</button>
-                <button class="btn-action" onclick="cancelEdit()">ยกเลิก</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="db-badge" id="dbStatus">💾 IndexedDB: 0 รายการ</div>
-
+  </div>
+  <main class="main-content">
+    <section id="welcomeScreen" class="card welcome-area">
+      <h1>ยินดีต้อนรับ</h1>
+      <p>ระบบพร้อมใช้งานบนมือถือ iOS / Android / Desktop</p>
+      <p style="margin-top:14px;font-size:.92rem">ข้อมูลรายวิชาจะโหลดจากชุดข้อมูลตั้งต้น และสามารถ Import/Export JSON ได้</p>
+    </section>
+    <section id="coursePanel" class="card" style="display:none">
+      <div class="action-bar"><button class="btn-action" onclick="toggleFullscreen()">เปิดแบบเต็มจอ</button><button class="btn-action" onclick="enableEditMode()">✏️ แก้ไขข้อมูล</button></div>
+      <div id="displayArea"><h2 id="courseName"></h2><p id="courseType"></p><div class="course-view"><img id="courseImage" alt=""></div></div>
+      <div id="editArea" style="display:none"><h3>✏️ แก้ไขรายวิชา</h3><input id="editName" placeholder="ชื่อวิชา"><input type="file" id="editImageUpload" accept="image/*"><div style="display:flex;gap:10px;margin-top:12px"><button class="btn-action" style="background:#10b981;color:white" onclick="saveEdit()">บันทึก</button><button class="btn-action" onclick="cancelEdit()">ยกเลิก</button></div></div>
+    </section>
+  </main>
+  <div class="db-badge" id="dbStatus">IndexedDB: กำลังเชื่อมต่อ</div>
 <script>
-    // ---------- ตั้งค่า IndexedDB ----------
-    const DB_NAME = 'KMSmartHub';
-    const STORE_NAME = 'courses';
-    let db = null;
-    let currentFilter = 'MF';
-    let currentCourseId = null;
-
-    // เปิด Database
-    function openDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 2);
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => {
-                db = request.result;
-                resolve(db);
-            };
-            request.onupgradeneeded = (event) => {
-                const dbRef = event.target.result;
-                if (!dbRef.objectStoreNames.contains(STORE_NAME)) {
-                    dbRef.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                }
-            };
-        });
-    }
-
-    // Helper DB functions
-    async function getAllCourses() {
-        return new Promise((res, rej) => {
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const store = tx.objectStore(STORE_NAME);
-            const req = store.getAll();
-            req.onsuccess = () => res(req.result || []);
-            req.onerror = () => rej(req.error);
-        });
-    }
-
-    async function saveCourse(course) {
-        return new Promise((res, rej) => {
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const store = tx.objectStore(STORE_NAME);
-            const req = store.put(course);
-            req.onsuccess = () => res();
-            req.onerror = () => rej(req.error);
-        });
-    }
-
-    async function deleteCourseById(id) {
-        return new Promise((res, rej) => {
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const store = tx.objectStore(STORE_NAME);
-            const req = store.delete(id);
-            req.onsuccess = () => res();
-            req.onerror = () => rej(req.error);
-        });
-    }
-
-    async function clearAllCourses() {
-        const all = await getAllCourses();
-        for (let c of all) {
-            await deleteCourseById(c.id);
-        }
-    }
-
-    // ---------- UI หลัก ----------
-    async function refreshUI() {
-        if (!db) return;
-        const courses = await getAllCourses();
-        const mfCourses = courses.filter(c => c.type === 'MF');
-        const ssCourses = courses.filter(c => c.type === 'SS');
-        document.getElementById('countMF').innerText = mfCourses.length;
-        document.getElementById('countSS').innerText = ssCourses.length;
-        document.getElementById('dbStatus').innerText = `💾 IndexedDB: ${courses.length} รายการ`;
-
-        const filtered = courses.filter(c => c.type === currentFilter);
-        const container = document.getElementById('subjectList');
-        if (filtered.length === 0) {
-            container.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;">❓ ไม่มีข้อมูลในหมวดนี้<br><small>กด "สแกนรูปภาพ" หรือ "เพิ่มวิชาใหม่"</small></div>';
-        } else {
-            container.innerHTML = filtered.map(c => `
-                <div class="subject-item ${currentCourseId === c.id ? 'active' : ''}" onclick="selectCourse('${c.id}')">
-                    <span>📘 ${c.name}</span>
-                    <button class="btn-danger-sm" onclick="event.stopPropagation(); deleteCourse('${c.id}')">🗑️</button>
-                </div>
-            `).join('');
-        }
-    }
-
-    async function selectCourse(id) {
-        if (!db) return;
-        const courses = await getAllCourses();
-        const course = courses.find(c => c.id === id);
-        if (!course) return;
-        currentCourseId = id;
-        document.getElementById('welcomeScreen').style.display = 'none';
-        document.getElementById('coursePanel').style.display = 'block';
-        document.getElementById('displayArea').style.display = 'block';
-        document.getElementById('editArea').style.display = 'none';
-        document.getElementById('courseName').innerText = course.name;
-        document.getElementById('courseType').innerText = course.type === 'MF' ? 'หลักสูตร จันทร์ - ศุกร์' : 'หลักสูตร เสาร์ - อาทิตย์';
-        const imgEl = document.getElementById('courseImage');
-        imgEl.src = course.imageUrl || '';
-        imgEl.alt = course.name;
-        await refreshUI();
-    }
-
-    function filterCategory(type) {
-        currentFilter = type;
-        document.getElementById('kpiMF').classList.toggle('active', type === 'MF');
-        document.getElementById('kpiSS').classList.toggle('active', type === 'SS');
-        refreshUI();
-    }
-
-    async function createNewCourse() {
-        let name = prompt("ชื่อวิชา:", "วิชาใหม่");
-        if (!name) return;
-        const newId = 'course_' + Date.now();
-        const newCourse = {
-            id: newId,
-            name: name,
-            type: currentFilter,
-            imageUrl: '',
-            createdAt: new Date().toISOString()
-        };
-        await saveCourse(newCourse);
-        await refreshUI();
-        await selectCourse(newId);
-    }
-
-    async function deleteCourse(id) {
-        if (!confirm("ลบรายวิชานี้ใช่ไหม?")) return;
-        await deleteCourseById(id);
-        if (currentCourseId === id) {
-            document.getElementById('welcomeScreen').style.display = 'block';
-            document.getElementById('coursePanel').style.display = 'none';
-            currentCourseId = null;
-        }
-        await refreshUI();
-    }
-
-    // ---------- แก้ไขรูปแบบ (ชื่อ + รูป) ----------
-    function enableEditMode() {
-        if (!currentCourseId) return;
-        document.getElementById('displayArea').style.display = 'none';
-        document.getElementById('editArea').style.display = 'block';
-        const nameField = document.getElementById('editName');
-        nameField.value = document.getElementById('courseName').innerText;
-        document.getElementById('editImageUpload').value = '';
-    }
-
-    async function saveEdit() {
-        if (!currentCourseId) return;
-        const courses = await getAllCourses();
-        const course = courses.find(c => c.id === currentCourseId);
-        if (!course) return;
-        course.name = document.getElementById('editName').value;
-        const file = document.getElementById('editImageUpload').files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                course.imageUrl = e.target.result;
-                await saveCourse(course);
-                await selectCourse(currentCourseId);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            await saveCourse(course);
-            await selectCourse(currentCourseId);
-        }
-        cancelEdit();
-    }
-
-    function cancelEdit() {
-        if (currentCourseId) selectCourse(currentCourseId);
-        else document.getElementById('editArea').style.display = 'none';
-    }
-
-    // ---------- สแกนรูปจากโฟลเดอร์ courses-img ----------
-    async function scanCourses() {
-        const statusDiv = document.getElementById('dbStatus');
-        statusDiv.innerText = "⏳ กำลังสแกนรูป...";
-        // 🔧 แก้ไขรายชื่อไฟล์ให้ตรงกับไฟล์จริงของคุณ (กรุณาใส่ให้ครบถ้วน)
-const imageList = [
-    "applied-astrology-mf.png",
-    "applied-astrology-ss.jpg",
-    "barber-mf.jpg",
-    "barber-ss.jpg",
-    "basic-computer-ss.jpg",
-    "batik-tiedye-mf.jpg",
-    "beautician-mf.jpg",
-    "beautician-ss.jpg",
-    "Business internet-mf.jpg",
-    "computer-repair-ss.jpg",
-    "contemporary-craft-mf.jpg",
-    "fancy-candle-ss.jpg",
-    "Flower-mf.jpg",
-    "Flower-ss.jpg",
-    "Foot Massage-mf.jpg",
-    "Foot Massage-ss.jpg",
-    "Graphic Design-mf.jpg",
-    "herbal-processing-mf.jpg",
-    "homemade-cafe-mf.jpg",
-    "homemade-cafe-ss.jpg",
-    "Makeup-mf.jpg",
-    "Makeup-ss.jpg",
-    "Mobile Repairing-ss.jpg",
-    "nail-art-mf.jpg",
-    "nail-art-ss.jpg",
-    "patchwork-quilting-mf.jpg",
-    "scented-clay-flower-mf.jpg",
-    "scented-clay-flower-ss.jpg",
-    "Thai Massage-mf.jpg",
-    "Thai Massage-ss.jpg",
-    "thai-snacks-desserts-mf.jpg",
-    "thai-snacks-desserts-ss.jpg",
-    "womens-sewing-mf.jpg",
-    "womens-sewing-ss.jpg"
+const DEFAULT_COURSES = [
+  {
+    "id": "img_Business internet-mf_jpg",
+    "name": "Business internet mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Business internet-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.252Z"
+  },
+  {
+    "id": "img_Flower-mf_jpg",
+    "name": "Flower mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Flower-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.255Z"
+  },
+  {
+    "id": "img_Flower-ss_jpg",
+    "name": "Flower ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/Flower-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.256Z"
+  },
+  {
+    "id": "img_Foot Massage-mf_jpg",
+    "name": "Foot Massage mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Foot Massage-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.257Z"
+  },
+  {
+    "id": "img_Foot Massage-ss_jpg",
+    "name": "Foot Massage ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/Foot Massage-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.257Z"
+  },
+  {
+    "id": "img_Graphic Design-mf_jpg",
+    "name": "Graphic Design mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Graphic Design-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.258Z"
+  },
+  {
+    "id": "img_Makeup-mf_jpg",
+    "name": "Makeup mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Makeup-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.261Z"
+  },
+  {
+    "id": "img_Makeup-ss_jpg",
+    "name": "Makeup ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/Makeup-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.261Z"
+  },
+  {
+    "id": "img_Mobile Repairing-ss_jpg",
+    "name": "Mobile Repairing ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/Mobile Repairing-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.262Z"
+  },
+  {
+    "id": "img_Thai Massage-mf_jpg",
+    "name": "Thai Massage mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/Thai Massage-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.265Z"
+  },
+  {
+    "id": "img_Thai Massage-ss_jpg",
+    "name": "Thai Massage ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/Thai Massage-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.266Z"
+  },
+  {
+    "id": "img_applied-astrology-mf_png",
+    "name": "applied astrology mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/applied-astrology-mf.png",
+    "createdAt": "2026-05-09T11:14:44.242Z"
+  },
+  {
+    "id": "img_applied-astrology-ss_jpg",
+    "name": "applied astrology ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/applied-astrology-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.245Z"
+  },
+  {
+    "id": "img_barber-mf_jpg",
+    "name": "barber mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/barber-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.246Z"
+  },
+  {
+    "id": "img_barber-ss_jpg",
+    "name": "barber ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/barber-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.247Z"
+  },
+  {
+    "id": "img_basic-computer-ss_jpg",
+    "name": "basic computer ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/basic-computer-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.248Z"
+  },
+  {
+    "id": "img_batik-tiedye-mf_jpg",
+    "name": "batik tiedye mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/batik-tiedye-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.249Z"
+  },
+  {
+    "id": "img_beautician-mf_jpg",
+    "name": "beautician mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/beautician-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.250Z"
+  },
+  {
+    "id": "img_beautician-ss_jpg",
+    "name": "beautician ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/beautician-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.251Z"
+  },
+  {
+    "id": "img_computer-repair-ss_jpg",
+    "name": "computer repair ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/computer-repair-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.253Z"
+  },
+  {
+    "id": "img_contemporary-craft-mf_jpg",
+    "name": "contemporary craft mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/contemporary-craft-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.254Z"
+  },
+  {
+    "id": "img_fancy-candle-ss_jpg",
+    "name": "fancy candle ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/fancy-candle-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.255Z"
+  },
+  {
+    "id": "img_herbal-processing-mf_jpg",
+    "name": "herbal processing mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/herbal-processing-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.259Z"
+  },
+  {
+    "id": "img_homemade-cafe-mf_jpg",
+    "name": "homemade cafe mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/homemade-cafe-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.259Z"
+  },
+  {
+    "id": "img_homemade-cafe-ss_jpg",
+    "name": "homemade cafe ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/homemade-cafe-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.260Z"
+  },
+  {
+    "id": "img_nail-art-mf_jpg",
+    "name": "nail art mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/nail-art-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.263Z"
+  },
+  {
+    "id": "img_nail-art-ss_jpg",
+    "name": "nail art ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/nail-art-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.263Z"
+  },
+  {
+    "id": "img_patchwork-quilting-mf_jpg",
+    "name": "patchwork quilting mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/patchwork-quilting-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.264Z"
+  },
+  {
+    "id": "img_scented-clay-flower-mf_jpg",
+    "name": "scented clay flower mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/scented-clay-flower-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.264Z"
+  },
+  {
+    "id": "img_scented-clay-flower-ss_jpg",
+    "name": "scented clay flower ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/scented-clay-flower-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.265Z"
+  },
+  {
+    "id": "img_thai-snacks-desserts-mf_jpg",
+    "name": "thai snacks desserts mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/thai-snacks-desserts-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.267Z"
+  },
+  {
+    "id": "img_thai-snacks-desserts-ss_jpg",
+    "name": "thai snacks desserts ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/thai-snacks-desserts-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.267Z"
+  },
+  {
+    "id": "img_womens-sewing-mf_jpg",
+    "name": "womens sewing mf",
+    "type": "MF",
+    "imageUrl": "/km-smart-hub/courses-img/womens-sewing-mf.jpg",
+    "createdAt": "2026-05-09T11:14:44.268Z"
+  },
+  {
+    "id": "img_womens-sewing-ss_jpg",
+    "name": "womens sewing ss",
+    "type": "SS",
+    "imageUrl": "/km-smart-hub/courses-img/womens-sewing-ss.jpg",
+    "createdAt": "2026-05-09T11:14:44.269Z"
+  }
 ];
-        const baseUrl = '/km-smart-hub/courses-img/';
-        let added = 0, skipped = 0;
-        const existing = await getAllCourses();
-        const existingIds = new Set(existing.map(c => c.id));
-        for (let fileName of imageList) {
-            let name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '').replace(/-/g, ' ');
-            let type = fileName.includes('-ss') ? 'SS' : 'MF';
-            let id = `img_${fileName.replace(/\./g, '_')}`;
-            if (!existingIds.has(id)) {
-                await saveCourse({
-                    id: id,
-                    name: name,
-                    type: type,
-                    imageUrl: baseUrl + fileName,
-                    createdAt: new Date().toISOString()
-                });
-                added++;
-            } else {
-                skipped++;
-            }
-        }
-        await refreshUI();
-        statusDiv.innerText = `✅ สแกนเสร็จ: +${added} วิชา (มีแล้ว ${skipped})`;
-        setTimeout(() => refreshUI(), 1500);
-        if (added > 0) alert(`📸 สแกนสำเร็จ! เพิ่มวิชาใหม่ ${added} รายการ`);
-    }
-
-    // ---------- Import / Export ----------
-    async function exportAllData() {
-        const courses = await getAllCourses();
-        const dataStr = JSON.stringify(courses, null, 2);
-        const blob = new Blob([dataStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `km_backup_${new Date().toISOString().slice(0,19)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    async function handleImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const text = await file.text();
-        const imported = JSON.parse(text);
-        if (!Array.isArray(imported)) {
-            alert("ไฟล์ไม่ถูกต้อง");
-            return;
-        }
-        for (let item of imported) {
-            if (item.id && item.name) {
-                await saveCourse(item);
-            }
-        }
-        await refreshUI();
-        alert("นำเข้าข้อมูลสำเร็จ");
-        event.target.value = '';
-    }
-
-    async function clearDatabase() {
-        if (!confirm("⚠️ ลบข้อมูลทั้งหมดในระบบใช่ไหม? (ไม่สามารถกู้คืนได้)")) return;
-        await clearAllCourses();
-        await refreshUI();
-        document.getElementById('welcomeScreen').style.display = 'block';
-        document.getElementById('coursePanel').style.display = 'none';
-        currentCourseId = null;
-        alert("ล้างข้อมูลเรียบร้อย");
-    }
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-            document.body.classList.add('fullscreen-mode');
-        } else {
-            document.exitFullscreen();
-            document.body.classList.remove('fullscreen-mode');
-        }
-    }
-
-    // ---------- เริ่มต้นระบบ ----------
-    window.onload = async () => {
-        await openDB();
-        await refreshUI();
-        filterCategory('MF');
-    };
+const DB_NAME='KMSmartHub'; const STORE_NAME='courses'; let db=null; let currentFilter='MF'; let currentCourseId=null;
+function cleanName(fileName){ return fileName.replace(/\.(jpg|jpeg|png|gif|webp)$/i,'').replace(/-(mf|ss)$/i,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim(); }
+function normalizeCourse(c){ const file=(c.imageUrl||'').split('/').pop()||c.name||''; const type=c.type || (/[-_]ss\./i.test(file)?'SS':'MF'); return {...c,id:c.id||('img_'+file.replace(/\./g,'_')),name:c.name && !/\s(mf|ss)$/i.test(c.name)?c.name:cleanName(file),type,imageUrl:c.imageUrl||('/km-smart-hub/courses-img/'+file),createdAt:c.createdAt||new Date().toISOString()}; }
+function openDB(){return new Promise((resolve,reject)=>{ if(!('indexedDB' in window)) return reject(new Error('IndexedDB not supported')); const r=indexedDB.open(DB_NAME,2); r.onerror=()=>reject(r.error); r.onsuccess=()=>{db=r.result; resolve(db)}; r.onupgradeneeded=e=>{const d=e.target.result; if(!d.objectStoreNames.contains(STORE_NAME)) d.createObjectStore(STORE_NAME,{keyPath:'id'});}; });}
+function txStore(mode='readonly'){ return db.transaction(STORE_NAME,mode).objectStore(STORE_NAME); }
+async function getAllCourses(){return new Promise((res,rej)=>{const req=txStore().getAll(); req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);});}
+async function saveCourse(course){return new Promise((res,rej)=>{const req=txStore('readwrite').put(normalizeCourse(course)); req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);});}
+async function deleteCourseById(id){return new Promise((res,rej)=>{const req=txStore('readwrite').delete(id); req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);});}
+async function clearAllCourses(){const all=await getAllCourses(); for(const c of all) await deleteCourseById(c.id);}
+async function seedDefaultCourses(showAlert=false){let added=0,updated=0; const existing=new Set((await getAllCourses()).map(c=>c.id)); for(const raw of DEFAULT_COURSES){ const c=normalizeCourse(raw); await saveCourse(c); existing.has(c.id)?updated++:added++; } await refreshUI(); if(showAlert) alert(`โหลดข้อมูลสำเร็จ: เพิ่ม ${added} / อัปเดต ${updated} รายการ`);}
+async function refreshUI(){ if(!db) return; const courses=(await getAllCourses()).map(normalizeCourse).sort((a,b)=>a.name.localeCompare(b.name,'th')); document.getElementById('countMF').textContent=courses.filter(c=>c.type==='MF').length; document.getElementById('countSS').textContent=courses.filter(c=>c.type==='SS').length; document.getElementById('dbStatus').textContent=`IndexedDB: ${courses.length} รายการ`; const filtered=courses.filter(c=>c.type===currentFilter); const box=document.getElementById('subjectList'); if(!filtered.length){box.innerHTML='<div style="color:#94a3b8;text-align:center;padding:20px">ไม่มีข้อมูลในหมวดนี้</div>';return} box.innerHTML=filtered.map(c=>`<div class="subject-item ${currentCourseId===c.id?'active':''}" onclick="selectCourse('${c.id.replace(/'/g,"\'")}')"><span>${c.name}</span><button class="btn-danger-sm" onclick="event.stopPropagation();deleteCourse('${c.id.replace(/'/g,"\'")}')">ลบ</button></div>`).join(''); }
+async function selectCourse(id){const courses=await getAllCourses(); const c=normalizeCourse(courses.find(x=>x.id===id)||{}); if(!c.id) return; currentCourseId=id; welcomeScreen.style.display='none'; coursePanel.style.display='block'; displayArea.style.display='block'; editArea.style.display='none'; courseName.textContent=c.name; courseType.textContent=c.type==='MF'?'หลักสูตร จันทร์-ศุกร์':'หลักสูตร เสาร์-อาทิตย์'; courseImage.src=c.imageUrl; courseImage.alt=c.name; await refreshUI(); if(matchMedia('(max-width: 820px)').matches) coursePanel.scrollIntoView({behavior:'smooth',block:'start'});}
+function filterCategory(type){currentFilter=type; kpiMF.classList.toggle('active',type==='MF'); kpiSS.classList.toggle('active',type==='SS'); refreshUI();}
+async function createNewCourse(){const name=prompt('ชื่อวิชา:','วิชาใหม่'); if(!name) return; const c={id:'course_'+Date.now(),name,type:currentFilter,imageUrl:'',createdAt:new Date().toISOString()}; await saveCourse(c); await refreshUI(); await selectCourse(c.id);}
+async function deleteCourse(id){if(!confirm('ลบรายวิชานี้ใช่ไหม?')) return; await deleteCourseById(id); if(currentCourseId===id){currentCourseId=null; welcomeScreen.style.display='block'; coursePanel.style.display='none';} await refreshUI();}
+function enableEditMode(){ if(!currentCourseId) return; displayArea.style.display='none'; editArea.style.display='block'; editName.value=courseName.textContent; editImageUpload.value=''; }
+async function saveEdit(){ if(!currentCourseId) return; const courses=await getAllCourses(); const c=courses.find(x=>x.id===currentCourseId); if(!c) return; c.name=editName.value.trim()||c.name; const file=editImageUpload.files[0]; if(file){ const reader=new FileReader(); reader.onload=async e=>{c.imageUrl=e.target.result; await saveCourse(c); await selectCourse(currentCourseId);}; reader.readAsDataURL(file); } else { await saveCourse(c); await selectCourse(currentCourseId); } }
+function cancelEdit(){ if(currentCourseId) selectCourse(currentCourseId); else editArea.style.display='none'; }
+async function exportAllData(){const data=JSON.stringify(await getAllCourses(),null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`km_backup_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);}
+async function handleImport(event){try{const file=event.target.files[0]; if(!file) return; const imported=JSON.parse(await file.text()); if(!Array.isArray(imported)) throw new Error('JSON ต้องเป็น Array'); for(const item of imported) if(item.id||item.name) await saveCourse(item); await refreshUI(); alert('นำเข้าข้อมูลสำเร็จ');}catch(e){alert('ไฟล์ไม่ถูกต้อง: '+e.message)}finally{event.target.value='';}}
+async function clearDatabase(){if(!confirm('⚠️ ลบข้อมูลทั้งหมดในระบบใช่ไหม?')) return; await clearAllCourses(); currentCourseId=null; welcomeScreen.style.display='block'; coursePanel.style.display='none'; await refreshUI();}
+function toggleFullscreen(){document.body.classList.toggle('fullscreen-mode'); const el=document.documentElement; if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{}); else if(document.exitFullscreen) document.exitFullscreen().catch(()=>{});}
+window.addEventListener('load',async()=>{try{await openDB(); if((await getAllCourses()).length===0) await seedDefaultCourses(false); await refreshUI(); filterCategory('MF');}catch(e){dbStatus.textContent='ไม่สามารถใช้ IndexedDB ได้'; alert('iOS อาจอยู่ใน Private Mode หรือบล็อกพื้นที่จัดเก็บ: '+e.message);}});
 </script>
 </body>
 </html>
