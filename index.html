@@ -91,6 +91,135 @@ input,select,button{font:inherit}
   .detail-content{padding:18px}
   .detail-content h2{font-size:24px}
 }
+
+/* === KM SMART HUB : MOBILE MODAL SCALE FIX ===
+   แก้ popup รายละเอียดหลักสูตรล้นจอมือถือ / iPhone Safari
+   คงรูปแบบ Desktop เดิมไว้
+*/
+@media (max-width: 640px){
+
+  html,
+  body{
+    overflow-x:hidden !important;
+  }
+
+  .modal{
+    align-items:flex-start !important;
+    justify-content:center !important;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom))
+      10px !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  .modal.show{
+    display:flex !important;
+  }
+
+  .detail{
+    width:calc(100vw - 20px) !important;
+    max-width:calc(100vw - 20px) !important;
+    height:auto !important;
+    max-height:calc(100dvh - 20px) !important;
+    grid-template-columns:1fr !important;
+    border-radius:24px !important;
+    overflow:hidden !important;
+    display:flex !important;
+    flex-direction:column !important;
+  }
+
+  .detail img{
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:38dvh !important;
+    aspect-ratio:16/10 !important;
+    object-fit:contain !important;
+    object-position:center top !important;
+    background:#fff !important;
+    display:block !important;
+    flex:0 0 auto !important;
+  }
+
+  .detail-content{
+    padding:16px 16px 18px !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    max-height:calc(100dvh - 38dvh - 40px) !important;
+    flex:1 1 auto !important;
+  }
+
+  .detail-content h2{
+    font-size:26px !important;
+    line-height:1.15 !important;
+    margin:10px 0 10px !important;
+    word-break:break-word !important;
+  }
+
+  .detail-content p{
+    font-size:18px !important;
+    line-height:1.55 !important;
+    margin:0 0 14px !important;
+  }
+
+  .detail-actions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-top:14px !important;
+  }
+
+  .detail-actions .btn,
+  .detail-actions button,
+  .detail-actions a{
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+    min-height:48px !important;
+  }
+
+  .close{
+    right:14px !important;
+    top:max(14px, env(safe-area-inset-top)) !important;
+    width:44px !important;
+    height:44px !important;
+    font-size:32px !important;
+    background:rgba(0,0,0,.46) !important;
+    color:#fff !important;
+    border:1px solid rgba(255,255,255,.28) !important;
+    z-index:10000 !important;
+  }
+}
+
+@media (max-width: 390px){
+  .detail{
+    width:calc(100vw - 14px) !important;
+    max-width:calc(100vw - 14px) !important;
+    border-radius:22px !important;
+  }
+
+  .detail img{
+    max-height:34dvh !important;
+    aspect-ratio:4/3 !important;
+  }
+
+  .detail-content{
+    padding:14px !important;
+    max-height:calc(100dvh - 34dvh - 34px) !important;
+  }
+
+  .detail-content h2{
+    font-size:24px !important;
+  }
+
+  .detail-content p{
+    font-size:17px !important;
+  }
+}
+
 </style>
 </head>
 <body>
