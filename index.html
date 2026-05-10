@@ -220,6 +220,56 @@ input,select,button{font:inherit}
   }
 }
 
+
+/* === KM SMART HUB : MOBILE POSTER VIEWER PATCH ===
+   บนมือถือซ่อนคำอธิบายที่ซ้ำกัน เพื่อให้พื้นที่หลักกับโปสเตอร์
+*/
+@media (max-width: 640px){
+
+  .detail img{
+    max-height:68dvh !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center top !important;
+    background:#fff !important;
+  }
+
+  .detail-content{
+    max-height:calc(100dvh - 68dvh - 28px) !important;
+    padding:14px 16px 18px !important;
+  }
+
+  .detail-content p{
+    display:none !important;
+  }
+
+  .detail-content h2{
+    font-size:28px !important;
+    margin:8px 0 12px !important;
+  }
+
+  .detail-actions{
+    margin-top:10px !important;
+  }
+
+  .detail-actions .btn,
+  .detail-actions button,
+  .detail-actions a{
+    min-height:52px !important;
+    font-size:18px !important;
+  }
+}
+
+@media (max-width: 390px){
+  .detail img{
+    max-height:64dvh !important;
+  }
+
+  .detail-content{
+    max-height:calc(100dvh - 64dvh - 28px) !important;
+  }
+}
+
 </style>
 </head>
 <body>
